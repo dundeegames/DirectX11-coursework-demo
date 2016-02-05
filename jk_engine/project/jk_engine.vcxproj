@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8838F22F-F851-4B28-8E6D-50AB304A773D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>jk_engine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\lib\$(Configuration)\</OutDir>
+    <IntDir>..\temp\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\lib\$(Configuration)\</OutDir>
+    <IntDir>..\temp\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\jk_engine\external\DirectXTK\Inc;$(SolutionDir)..\jk_engine\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\jk_engine\external\DirectXTK\Inc;$(SolutionDir)..\jk_engine\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\Geometry\Deprecated\BaseMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\CubeMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\OldModel.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\OrthoMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\PlaneMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\PointMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\QuadMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\SphereMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\TessellationMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Deprecated\TriangleMesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Mesh.cpp" />
+    <ClCompile Include="..\source\Geometry\Texture.cpp" />
+    <ClCompile Include="..\source\Shaders\BaseShader.cpp" />
+    <ClCompile Include="..\source\Shaders\BoxBlurShader.cpp" />
+    <ClCompile Include="..\source\Shaders\ColourShader.cpp" />
+    <ClCompile Include="..\source\Shaders\DepthShader.cpp" />
+    <ClCompile Include="..\source\Shaders\GeometryShader.cpp" />
+    <ClCompile Include="..\source\Shaders\HorizontalBlurShader.cpp" />
+    <ClCompile Include="..\source\Shaders\LightShader.cpp" />
+    <ClCompile Include="..\source\Shaders\MultiLightShader.cpp" />
+    <ClCompile Include="..\source\Shaders\PointLightShader.cpp" />
+    <ClCompile Include="..\source\Shaders\ShadowShader.cpp" />
+    <ClCompile Include="..\source\Shaders\SpecularShader.cpp" />
+    <ClCompile Include="..\source\Shaders\TessellationShader.cpp" />
+    <ClCompile Include="..\source\Shaders\TextureShader.cpp" />
+    <ClCompile Include="..\source\Shaders\UberShader.cpp" />
+    <ClCompile Include="..\source\Shaders\VerticalBlurShader.cpp" />
+    <ClCompile Include="..\source\Shaders\VertManipShader.cpp" />
+    <ClCompile Include="..\source\System\BaseApplication.cpp" />
+    <ClCompile Include="..\source\System\Camera.cpp" />
+    <ClCompile Include="..\source\System\Common.cpp" />
+    <ClCompile Include="..\source\System\D3D.cpp" />
+    <ClCompile Include="..\source\System\Input.cpp" />
+    <ClCompile Include="..\source\System\Light.cpp" />
+    <ClCompile Include="..\source\System\LightManager.cpp" />
+    <ClCompile Include="..\source\System\MeshGenerator.cpp" />
+    <ClCompile Include="..\source\System\RenderStateHelper.cpp" />
+    <ClCompile Include="..\source\System\RenderTexture.cpp" />
+    <ClCompile Include="..\source\System\ResourceManager.cpp" />
+    <ClCompile Include="..\source\System\System.cpp" />
+    <ClCompile Include="..\source\System\Timer.cpp" />
+    <ClCompile Include="..\source\System\TokenStream.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\Geometry\Deprecated\BaseMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\CubeMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\OldModel.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\OrthoMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\PlaneMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\PointMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\QuadMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\SphereMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\TessellationMesh.h" />
+    <ClInclude Include="..\source\Geometry\Deprecated\TriangleMesh.h" />
+    <ClInclude Include="..\source\Geometry\Mesh.h" />
+    <ClInclude Include="..\source\Geometry\Texture.h" />
+    <ClInclude Include="..\source\Shaders\BaseShader.h" />
+    <ClInclude Include="..\source\Shaders\BoxBlurShader.h" />
+    <ClInclude Include="..\source\Shaders\ColourShader.h" />
+    <ClInclude Include="..\source\Shaders\DepthShader.h" />
+    <ClInclude Include="..\source\Shaders\GeometryShader.h" />
+    <ClInclude Include="..\source\Shaders\HorizontalBlurShader.h" />
+    <ClInclude Include="..\source\Shaders\LightShader.h" />
+    <ClInclude Include="..\source\Shaders\MultiLightShader.h" />
+    <ClInclude Include="..\source\Shaders\PointLightShader.h" />
+    <ClInclude Include="..\source\Shaders\ShadowShader.h" />
+    <ClInclude Include="..\source\Shaders\SpecularShader.h" />
+    <ClInclude Include="..\source\Shaders\TessellationShader.h" />
+    <ClInclude Include="..\source\Shaders\TextureShader.h" />
+    <ClInclude Include="..\source\Shaders\UberShader.h" />
+    <ClInclude Include="..\source\Shaders\VerticalBlurShader.h" />
+    <ClInclude Include="..\source\Shaders\VertManipShader.h" />
+    <ClInclude Include="..\source\System\BaseApplication.h" />
+    <ClInclude Include="..\source\System\Camera.h" />
+    <ClInclude Include="..\source\System\Common.h" />
+    <ClInclude Include="..\source\System\D3D.h" />
+    <ClInclude Include="..\source\System\Input.h" />
+    <ClInclude Include="..\source\System\Light.h" />
+    <ClInclude Include="..\source\System\LightManager.h" />
+    <ClInclude Include="..\source\System\MeshGenerator.h" />
+    <ClInclude Include="..\source\System\RenderStateHelper.h" />
+    <ClInclude Include="..\source\System\RenderTexture.h" />
+    <ClInclude Include="..\source\System\ResourceManager.h" />
+    <ClInclude Include="..\source\System\System.h" />
+    <ClInclude Include="..\source\System\Timer.h" />
+    <ClInclude Include="..\source\System\TokenStream.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\external\DirectXTK\DirectXTK_Desktop_2013.vcxproj">
+      <Project>{e0b52ae7-e160-4d32-bf3f-910b785e5a8e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{dd722c32-2d8f-4d43-a44e-614201800473}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{e93c27f7-ac50-416e-948c-8e65c1293f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{c19d5e2f-10e3-4614-b94a-668a2ee9a140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry\Deprecated">
+      <UniqueIdentifier>{d6d92319-8e3d-446c-a43d-594f69d14f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Deprecated">
+      <UniqueIdentifier>{f9245a08-636e-42ac-9ffc-3ac64358e206}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\Geometry\Texture.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\BaseShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\BaseApplication.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\Camera.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\D3D.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\Input.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\Light.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\RenderTexture.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\System.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\Timer.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\TokenStream.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\PointLightShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\Common.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Mesh.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\ResourceManager.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\MeshGenerator.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\BaseMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\CubeMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\OldModel.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\OrthoMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\PlaneMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\PointMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\QuadMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\SphereMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\TessellationMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Geometry\Deprecated\TriangleMesh.cpp">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\VertManipShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\LightManager.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\HorizontalBlurShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\VerticalBlurShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\TessellationShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\BoxBlurShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\DepthShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\ShadowShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\GeometryShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\System\RenderStateHelper.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\UberShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\ColourShader.cpp">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\LightShader.cpp">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\MultiLightShader.cpp">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\SpecularShader.cpp">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Shaders\TextureShader.cpp">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\Geometry\Texture.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\BaseShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\BaseApplication.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\Camera.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\D3D.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\Input.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\Light.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\RenderTexture.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\System.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\Timer.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\TokenStream.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\PointLightShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\Common.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Mesh.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\ResourceManager.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\MeshGenerator.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\BaseMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\CubeMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\OldModel.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\OrthoMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\PlaneMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\PointMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\QuadMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\SphereMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\TessellationMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\Deprecated\TriangleMesh.h">
+      <Filter>Geometry\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\VertManipShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\LightManager.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\HorizontalBlurShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\VerticalBlurShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\TessellationShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\BoxBlurShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\DepthShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\ShadowShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\GeometryShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\System\RenderStateHelper.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\UberShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\ColourShader.h">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\LightShader.h">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\MultiLightShader.h">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\SpecularShader.h">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\TextureShader.h">
+      <Filter>Shaders\Deprecated</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
