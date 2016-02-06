@@ -463,7 +463,7 @@ void Coursework::drawGeometry()
     // Set shader parameters (matrices and texture)
     m_TessellationShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
       projectionMatrix, XMMatrixTranslation(0.0f, 0.0f, 0.0f),
-      m_Terrain->GetTexture(), m_Camera, 64.0f);
+      m_Terrain->GetTexture(), m_Camera, 1.0f);
     // Render object (combination of mesh geometry and shader process
     m_TessellationShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
   }
