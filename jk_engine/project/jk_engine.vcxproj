@@ -108,6 +108,7 @@
     <ClCompile Include="..\source\Shaders\TessellationShader.cpp" />
     <ClCompile Include="..\source\Shaders\TextureShader.cpp" />
     <ClCompile Include="..\source\Shaders\UberShader.cpp" />
+    <ClCompile Include="..\source\Shaders\UberTessellShader.cpp" />
     <ClCompile Include="..\source\Shaders\VerticalBlurShader.cpp" />
     <ClCompile Include="..\source\Shaders\VertManipShader.cpp" />
     <ClCompile Include="..\source\System\BaseApplication.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="..\source\Shaders\TessellationShader.h" />
     <ClInclude Include="..\source\Shaders\TextureShader.h" />
     <ClInclude Include="..\source\Shaders\UberShader.h" />
+    <ClInclude Include="..\source\Shaders\UberTessellShader.h" />
     <ClInclude Include="..\source\Shaders\VerticalBlurShader.h" />
     <ClInclude Include="..\source\Shaders\VertManipShader.h" />
     <ClInclude Include="..\source\System\BaseApplication.h" />

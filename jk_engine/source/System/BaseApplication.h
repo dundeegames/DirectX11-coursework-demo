@@ -4,6 +4,7 @@
 #define _BASEAPPLICATION_H_
 
 // Globals
+//const bool FULL_SCREEN = true;
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 200.0f;	// 1000.0f

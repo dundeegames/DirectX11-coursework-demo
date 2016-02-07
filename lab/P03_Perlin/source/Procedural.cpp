@@ -41,7 +41,7 @@ Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_UberShader(nullptr), m_Cube(nullptr),
                            m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
                            m_Terrain(nullptr), m_TessellationShader(nullptr),
-                           m_RenderStage(LIGHTS_STAGE), m_EffectStage(NORMAL_STAGE),
+                           m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
   for (int i = 0; i < MAX_LIGHTS; i++)
@@ -185,12 +185,12 @@ bool Procedural::Frame()
 
   if (m_Input->isKeyDown(VK_F5))
   {
-    m_RenderStage = LIGHTS_STAGE;
+    m_RenderStage = DISPLACEMENT_OFF_STAGE;
   }
 
   if (m_Input->isKeyDown(VK_F6))
   {
-    m_RenderStage = TESELLATION_STAGE;
+    m_RenderStage = DISPLACEMENT_ON_STAGE;
   }
 
 
@@ -414,7 +414,6 @@ void Procedural::drawGeometry()
   m_Camera->GetViewMatrix(viewMatrix);
   m_Direct3D->GetProjectionMatrix(projectionMatrix);
 
-  //m_GeometryShader->enableShader(m_Direct3D->GetDeviceContext());
 
   // Send geometry data (from mesh)
   m_PointMesh->SendData(m_Direct3D->GetDeviceContext());
@@ -426,8 +425,6 @@ void Procedural::drawGeometry()
   // Render object (combination of mesh geometry and shader process
   m_GeometryShader->Render(m_Direct3D->GetDeviceContext(), m_PointMesh->GetIndexCount());
 
-  //Dissable Geometry Shader
-  //m_GeometryShader->dissableShader(m_Direct3D->GetDeviceContext());
 
   m_UberShader->setCamera(m_Camera);
 
@@ -443,18 +440,30 @@ void Procedural::drawGeometry()
   // Render object (combination of mesh geometry and shader process
   m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_Mesh->GetIndexCount());
 
-  if (m_RenderStage == LIGHTS_STAGE)
+  if (m_RenderStage == DISPLACEMENT_OFF_STAGE)
   {
-    // Send geometry data (from mesh)
-    m_PlaneMesh->SendData(m_Direct3D->GetDeviceContext());
-    m_UberShader->setTexture(m_PlaneMesh->GetTexture());
-    // Get Mesh position
-    worldMatrix = m_PlaneMesh->getWorldMatrix();
-    // Set shader parameters
-    m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix);
+    //// Send geometry data (from mesh)
+    //m_Terrain->SendData(m_Direct3D->GetDeviceContext());
+    //worldMatrix = XMMatrixTranslation(0.0f, -5.0f, 0.0f);
+    //// Set shader parameters (matrices and texture)
+    //m_TessellationShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
+    //  projectionMatrix, XMMatrixTranslation(0.0f, 0.0f, 0.0f),
+    //  m_Terrain->GetTexture(), m_Camera, 64.0f);
+    //// Render object (combination of mesh geometry and shader process
+    //m_TessellationShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
 
-    // Render object (combination of mesh geometry and shader process
-    m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_PlaneMesh->GetIndexCount());
+
+
+    //// Send geometry data (from mesh)
+    //m_PlaneMesh->SendData(m_Direct3D->GetDeviceContext());
+    //m_UberShader->setTexture(m_PlaneMesh->GetTexture());
+    //// Get Mesh position
+    //worldMatrix = m_PlaneMesh->getWorldMatrix();
+    //// Set shader parameters
+    //m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix);
+
+    //// Render object (combination of mesh geometry and shader process
+    //m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_PlaneMesh->GetIndexCount());
   }
   else
   {

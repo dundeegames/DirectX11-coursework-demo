@@ -154,6 +154,9 @@
     <ClCompile Include="..\source\Geometry\TerrainMesh.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\Shaders\UberTessellShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Geometry\Texture.h">
@@ -284,6 +287,9 @@
     </ClInclude>
     <ClInclude Include="..\source\Geometry\TerrainMesh.h">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\UberTessellShader.h">
+      <Filter>Shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -54,7 +54,7 @@
 
 // CLASS ///////////////////////////////////////////////////////////////////////
 
-enum RenderStage { LIGHTS_STAGE, TESELLATION_STAGE };
+enum RenderStage { DISPLACEMENT_OFF_STAGE, DISPLACEMENT_ON_STAGE };
 enum EffectStage { NORMAL_STAGE, GRAYSCALE_STAGE, INVERSE_STAGE, COLOURED_STAGE };
 
 
