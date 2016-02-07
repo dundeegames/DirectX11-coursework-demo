@@ -42,6 +42,7 @@
 #include <Shaders/GeometryShader.h>
 #include <Shaders/TessellationShader.h>
 #include <Shaders/UberShader.h>
+#include <Shaders/UberTessellShader.h>
 #include <Shaders/TextureShader.h>
 
 #include <Geometry/Deprecated/PointMesh.h>
@@ -83,6 +84,9 @@ private:
 
   UberShader* m_UberShader;
   TessellationShader* m_TessellationShader;
+  UberTessellShader* m_UberTessellShader;
+
+
   SphereMesh* m_Mesh;
   CubeMesh* m_Cube;
   TerrainMesh* m_Terrain;

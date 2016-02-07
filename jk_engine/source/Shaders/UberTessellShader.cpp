@@ -36,10 +36,10 @@
 
 
 UberTessellShader::UberTessellShader(ID3D11Device* device, HWND hwnd) : BaseShader(device, hwnd),
-m_matrixBuffer(nullptr), m_lightBuffer(nullptr),
-m_cameraBuffer(nullptr), m_tessellationBuffer(nullptr),
-m_sampleState(nullptr), m_Texture(nullptr),
-m_Camera(nullptr), m_Hwnd(hwnd)
+                              m_matrixBuffer(nullptr), m_lightBuffer(nullptr),
+                              m_cameraBuffer(nullptr), m_sampleState(nullptr),
+                              m_Texture(nullptr), m_Heightmap(nullptr), m_Camera(nullptr),
+                              m_Hwnd(hwnd), m_TessellationFactor(0.0f)
 {
 
 }
@@ -49,10 +49,10 @@ UberTessellShader::~UberTessellShader()
 {
   RELEASE_OBJECT(m_sampleState);
   RELEASE_OBJECT(m_matrixBuffer);
+  RELEASE_OBJECT(m_textureMatrixBuffer);
   RELEASE_OBJECT(m_layout);
   RELEASE_OBJECT(m_lightBuffer);
   RELEASE_OBJECT(m_cameraBuffer);
-  RELEASE_OBJECT(m_tessellationBuffer);
 
   //Release base shader components
   BaseShader::~BaseShader();
@@ -64,14 +64,16 @@ UberTessellShader::~UberTessellShader()
 void UberTessellShader::InitShader(WCHAR* vsFilename, WCHAR* psFilename)
 {
   D3D11_BUFFER_DESC matrixBufferDesc;
-  D3D11_SAMPLER_DESC samplerDesc;
+  D3D11_BUFFER_DESC textureMatrixBufferDesc;
   D3D11_BUFFER_DESC lightBufferDesc;
   D3D11_BUFFER_DESC cameraBufferDesc;
+  D3D11_SAMPLER_DESC samplerDesc;
 
   ZeroMemory(&matrixBufferDesc, sizeof(matrixBufferDesc));
-  ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+  ZeroMemory(&textureMatrixBufferDesc, sizeof(textureMatrixBufferDesc));
   ZeroMemory(&lightBufferDesc, sizeof(lightBufferDesc));
   ZeroMemory(&cameraBufferDesc, sizeof(cameraBufferDesc));
+  ZeroMemory(&samplerDesc, sizeof(samplerDesc));
 
   // Load (+ compile) shader files
   loadVertexShader(vsFilename);
@@ -88,12 +90,25 @@ void UberTessellShader::InitShader(WCHAR* vsFilename, WCHAR* psFilename)
   // Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
   m_device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
 
+
+  // Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
+  textureMatrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+  textureMatrixBufferDesc.ByteWidth = sizeof(TextureMatrixBufferType);
+  textureMatrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+  textureMatrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+  textureMatrixBufferDesc.MiscFlags = 0;
+  textureMatrixBufferDesc.StructureByteStride = 0;
+
+  // Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+  m_device->CreateBuffer(&matrixBufferDesc, NULL, &m_textureMatrixBuffer);
+
+
   // Create a texture sampler state description.
   // TODO: change mirroring back to tiling
   samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-  samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
-  samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
-  samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+  samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+  samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+  samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
   samplerDesc.MipLODBias = 0.0f;
   samplerDesc.MaxAnisotropy = 1;
   samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
@@ -193,24 +208,50 @@ void UberTessellShader::addLight(Light* light)
 // -----------------------------------------------------------------------------
 
 void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
-  const XMMATRIX &worldMatrix,
-  const XMMATRIX &viewMatrix,
-  const XMMATRIX &projectionMatrix)
+                                const XMMATRIX &worldMatrix,
+                                const XMMATRIX &viewMatrix,
+                                const XMMATRIX &projectionMatrix,
+                                const XMMATRIX &textureMatrix)
 {
   HRESULT result;
   D3D11_MAPPED_SUBRESOURCE mappedResource;
   MatrixBufferType* dataPtr;
+  TextureMatrixBufferType* textureMatrixPtr;
+
   CameraBufferType* camPtr;
   LightBufferType* lightPtr;
   LightBufferType zeroLightBuffer;
   //TessellationBufferType* tessellationPtr;
 
   unsigned int bufferNumber;
-  XMMATRIX tworld, tview, tproj;
+  XMMATRIX tworld, tview, tproj, texMatrix;
   XMFLOAT3 tempPosition;
 
   ZeroMemory(&mappedResource, sizeof(mappedResource));
   ZeroMemory(&zeroLightBuffer, sizeof(LightBufferType));
+
+  // Transpose the matrices to prepare them for the shader.
+  texMatrix = XMMatrixTranspose(textureMatrix);
+
+  // Lock the constant buffer so it can be written to.
+  result = deviceContext->Map(m_textureMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+  // Get a pointer to the data in the constant buffer.
+  textureMatrixPtr = (TextureMatrixBufferType*)mappedResource.pData;
+
+  // Copy the matrices into the constant buffer.
+  textureMatrixPtr->TextureMatrix = texMatrix;
+
+  // Unlock the constant buffer.
+  deviceContext->Unmap(m_textureMatrixBuffer, 0);
+
+  // Set the position of the constant buffer in the vertex shader.
+  bufferNumber = 0;
+
+  // Now set the constant buffer in the vertex shader with the updated values.
+  deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_textureMatrixBuffer);
+
+  //---
 
   // Transpose the matrices to prepare them for the shader.
   tworld = XMMatrixTranspose(worldMatrix);
@@ -233,13 +274,19 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
 
   // Set the position of the constant buffer in the vertex shader.
   bufferNumber = 0;
+  
 
-  // if tessellating:
-  //// Now set the constant buffer in the vertex shader with the updated values.
-  //deviceContext->DSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
-  // else
-  // Now set the constant buffer in the vertex shader with the updated values.
-  deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+  // if Hull shader is not null then set DS, else set VS
+  if (m_hullShader)
+  {
+    // Now set the constant buffer in the domain shader with the updated values.
+    deviceContext->DSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+  }
+  else
+  {
+    // Now set the constant buffer in the vertex shader with the updated values.
+    deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+  }
 
 
   // CAMERA: ---------
@@ -250,16 +297,32 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
   camPtr = (CameraBufferType*)mappedResource.pData;
 
   // Copy the matrices into the constant buffer.
-  camPtr->position = m_Camera->GetPosition();// worldMatrix;
+  camPtr->cameraPosition = m_Camera->GetPosition();// worldMatrix;
+  camPtr->tessellationFactor = m_TessellationFactor;
 
   // Unlock the constant buffer.
   deviceContext->Unmap(m_cameraBuffer, 0);
 
-  // Set the position of the constant buffer in the vertex shader.
-  bufferNumber = 1;
 
-  // Now set the constant buffer in the vertex shader with the updated values.
-  deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+  // if Hull shader is not null then set DS, else set VS
+  if (m_hullShader)
+  {
+    // Set the position of the constant buffer in the vertex shader.
+    bufferNumber = 0;
+
+    // Now set the constant buffer in the hull shader with the updated values.
+    deviceContext->HSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+  }
+  else
+  {
+    // Set the position of the constant buffer in the vertex shader.
+    bufferNumber = 1;
+
+    // Now set the constant buffer in the vertex shader with the updated values.
+    deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+  }
+
+
 
 
   // LIGHTS: ---------
@@ -296,19 +359,8 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
 
   //---------
 
-
-  //TODO: Fix
-  //Additional
-  // Send light data to pixel shader
-  //deviceContext->Map(m_tessellationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-  //tessellationPtr = (TessellationBufferType*)mappedResource.pData;
-  //tessellationPtr->tessellationFactor = 8.0f;
-  //tessellationPtr->padding = XMFLOAT3(1.0f, 1.0f, 1.0f);
-  //deviceContext->Unmap(m_tessellationBuffer, 0);
-  //bufferNumber = 0;
-  //deviceContext->HSSetConstantBuffers(bufferNumber, 1, &m_tessellationBuffer);
-
-
+  // Set shader texture resource in the domain shader.
+  deviceContext->DSSetShaderResources(0, 1, &m_Heightmap);
 
   // Set shader texture resource in the pixel shader.
   deviceContext->PSSetShaderResources(0, 1, &m_Texture);
@@ -318,6 +370,12 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
 
 void UberTessellShader::Render(ID3D11DeviceContext* deviceContext, int indexCount)
 {
+  // if Hull shader is not null then set the sampler state in the domain shader.
+  if (m_hullShader)
+  {
+    deviceContext->DSSetSamplers(0, 1, &m_sampleState);
+  }
+
   // Set the sampler state in the pixel shader.
   deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 

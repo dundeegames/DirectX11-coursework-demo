@@ -24,7 +24,7 @@
 
 
 #ifndef UBERTESSELLSHADER_H
-#define UBERSHADER_H
+#define UBERTESSELLSHADER_H
 
 
 // INCLUDES ////////////////////////////////////////////////////////////////////
@@ -63,9 +63,17 @@ private:
 
   struct CameraBufferType
   {
-    XMFLOAT3 position;
-    float tessellationFactor;       // if tessellation off, used as a padding
+    XMFLOAT3 cameraPosition;
+    float tessellationFactor;       // if = 0 , tessellation off
   };
+
+  struct  TextureMatrixBufferType
+  {
+    XMMATRIX TextureMatrix;
+  };
+
+
+
 
 public:
   UberTessellShader(ID3D11Device* device, HWND hwnd);
@@ -74,8 +82,10 @@ public:
   void InitShader(WCHAR* vsFilename, WCHAR* psFilename);
   void InitShader(WCHAR* vsFilename, WCHAR* hsFilename, WCHAR* dsFilename, WCHAR* psFilename);
 
+  void setHeightmap(ID3D11ShaderResourceView* heightmap) { m_Heightmap = heightmap; }
   void setTexture(ID3D11ShaderResourceView* texture) { m_Texture = texture; }
   void setCamera(Camera* camera) { m_Camera = camera; }
+  void setFixedTessellation(float tess) { m_TessellationFactor = tess; }
 
   /**
   * Accepts only MAX_LIGHTS number of lights!
@@ -87,7 +97,7 @@ public:
   void addLight(Light* light);
 
   void setView(ID3D11DeviceContext* deviceContext, const XMMATRIX &world,
-    const XMMATRIX &view, const XMMATRIX &projection);
+               const XMMATRIX &view, const XMMATRIX &projection, const XMMATRIX &textureMatrix);
 
   void Render(ID3D11DeviceContext* deviceContext, int vertexCount);
 
@@ -97,14 +107,18 @@ public:
 private:
   HWND m_Hwnd;
   ID3D11Buffer* m_matrixBuffer;
+  ID3D11Buffer* m_textureMatrixBuffer;
   ID3D11Buffer* m_lightBuffer;
   ID3D11Buffer* m_cameraBuffer;
-  ID3D11Buffer* m_tessellationBuffer;
+
   ID3D11SamplerState* m_sampleState;
+
+  float m_TessellationFactor;
 
   /**
   * memory allocations of these pointers are released elsewhere
   */
+  ID3D11ShaderResourceView* m_Heightmap;
   ID3D11ShaderResourceView* m_Texture;
   Camera* m_Camera;
   std::vector<Light*> m_Lights;
@@ -112,7 +126,7 @@ private:
 };
 
 
-#endif // UBERSHADER_H
+#endif // UBERTESSELLSHADER_H
 
 
 

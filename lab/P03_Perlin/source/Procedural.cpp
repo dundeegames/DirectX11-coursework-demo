@@ -41,6 +41,7 @@ Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_UberShader(nullptr), m_Cube(nullptr),
                            m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
                            m_Terrain(nullptr), m_TessellationShader(nullptr),
+                           m_UberTessellShader(nullptr),
                            m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
@@ -61,6 +62,7 @@ Procedural::~Procedural()
   DELETE_OBJECT(m_PointMesh);
   DELETE_OBJECT(m_GeometryShader);
   DELETE_OBJECT(m_TessellationShader);
+  DELETE_OBJECT(m_UberTessellShader);
   DELETE_OBJECT(m_Mesh);
   DELETE_OBJECT(m_Cube);
   DELETE_OBJECT(m_PlaneMesh);
@@ -133,6 +135,13 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
   m_UberShader = new UberShader(m_Direct3D->GetDevice(), hwnd);
   m_UberShader->InitShader(L"shaders/uber_vs.hlsl", L"shaders/uber_ps.hlsl");
 
+
+  m_UberTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
+  m_UberTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
+                                  L"shaders/ubertessell_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
+
+
+  
   initLights();
 
 
@@ -442,31 +451,6 @@ void Procedural::drawGeometry()
 
   if (m_RenderStage == DISPLACEMENT_OFF_STAGE)
   {
-    //// Send geometry data (from mesh)
-    //m_Terrain->SendData(m_Direct3D->GetDeviceContext());
-    //worldMatrix = XMMatrixTranslation(0.0f, -5.0f, 0.0f);
-    //// Set shader parameters (matrices and texture)
-    //m_TessellationShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
-    //  projectionMatrix, XMMatrixTranslation(0.0f, 0.0f, 0.0f),
-    //  m_Terrain->GetTexture(), m_Camera, 64.0f);
-    //// Render object (combination of mesh geometry and shader process
-    //m_TessellationShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
-
-
-
-    //// Send geometry data (from mesh)
-    //m_PlaneMesh->SendData(m_Direct3D->GetDeviceContext());
-    //m_UberShader->setTexture(m_PlaneMesh->GetTexture());
-    //// Get Mesh position
-    //worldMatrix = m_PlaneMesh->getWorldMatrix();
-    //// Set shader parameters
-    //m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix);
-
-    //// Render object (combination of mesh geometry and shader process
-    //m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_PlaneMesh->GetIndexCount());
-  }
-  else
-  {
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
     worldMatrix = XMMatrixTranslation(0.0f, -5.0f, 0.0f);
@@ -476,6 +460,28 @@ void Procedural::drawGeometry()
       m_Terrain->GetTexture(), m_Camera, 64.0f);
     // Render object (combination of mesh geometry and shader process
     m_TessellationShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
+
+
+
+
+  }
+  else
+  {
+    m_UberTessellShader->setCamera(m_Camera);
+    m_UberTessellShader->setFixedTessellation(2.0f);
+
+    // Send geometry data (from mesh)
+    m_Terrain->SendData(m_Direct3D->GetDeviceContext());
+
+    m_UberTessellShader->setTexture(nullptr);
+    m_UberTessellShader->setHeightmap(m_Terrain->GetTexture());
+
+    worldMatrix = XMMatrixTranslation(0.0f, -5.0f, 0.0f);
+    // Set shader parameters
+    m_UberTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
+      projectionMatrix, XMMatrixTranslation(0.0f, 0.0f, 0.0f));
+    // Render object (combination of mesh geometry and shader process
+    m_UberTessellShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
   }
 
 }

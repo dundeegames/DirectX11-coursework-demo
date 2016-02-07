@@ -3,28 +3,28 @@
 
 cbuffer TessellationBuffer : register(cb)
 {
-    float tessellationFactor;
-    float3 cameraPosition;
+  float3 cameraPosition;
+  float tessellationFactor;    
 };
 
 struct InputType
 {
-    float3 position : POSITION;
-    float2 tex : TEXCOORD0;
-    float4 colour : COLOR;
+  float3 position : POSITION;
+  float2 tex : TEXCOORD0;
+  float4 colour : COLOR;
 };
 
 struct ConstantOutputType
 {
-    float edges[4] : SV_TessFactor;
-    float inside[2] : SV_InsideTessFactor;
+  float edges[4] : SV_TessFactor;
+  float inside[2] : SV_InsideTessFactor;
 };
 
 struct OutputType
 {
-    float3 position : POSITION;
-    float2 tex : TEXCOORD0;
-    float4 colour : COLOR;
+  float3 position : POSITION;
+  float2 tex : TEXCOORD0;
+  float4 colour : COLOR;
 };
 
 ConstantOutputType PatchConstantFunction(InputPatch<InputType, 4> inputPatch, uint patchId : SV_PrimitiveID)
