@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
-* \file       Coursework.cpp
-* \brief      Coursework class
+* \file       Procedural.cpp
+* \brief      Procedural class
 *
 * \details    
 *
 * \author     Jiri Klic
 * \version    1.0
-* \date       November 2015
+* \date       February 2016
 * \pre
 * \post
 * \bug        No known bugs
@@ -35,7 +35,7 @@
 
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
 
-Coursework::Coursework() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
+Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_SpriteBatch(nullptr), m_SpriteFont(nullptr),
                            m_TextPosition(0.0f, 20.0f), m_Mesh(nullptr),
                            m_UberShader(nullptr), m_Cube(nullptr),
@@ -52,7 +52,7 @@ Coursework::Coursework() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
 }
 
 
-Coursework::~Coursework()
+Procedural::~Procedural()
 {
   // Run base application deconstructor
   BaseApplication::~BaseApplication();
@@ -82,7 +82,7 @@ Coursework::~Coursework()
 
 // -----------------------------------------------------------------------------
 
-void Coursework::init(HINSTANCE hinstance, HWND hwnd,
+void Procedural::init(HINSTANCE hinstance, HWND hwnd,
                       int screenWidth, int screenHeight, Input *in)
 {
   BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in);
@@ -122,7 +122,8 @@ void Coursework::init(HINSTANCE hinstance, HWND hwnd,
   m_PlaneMesh->setRotation(90.0f, 0.0f, 0.0f);
 
 
-  m_Terrain = new TessellationMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg");
+  m_Terrain = new TerrainMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg",
+                              50.0f, 50.0f, 32, 32);
 
   m_TessellationShader = new TessellationShader(m_Direct3D->GetDevice(), hwnd);
   m_TessellationShader->InitShader(L"shaders/tessellation_vs.hlsl", L"shaders/tessellation_hs.hlsl",
@@ -151,7 +152,7 @@ void Coursework::init(HINSTANCE hinstance, HWND hwnd,
 
 // -----------------------------------------------------------------------------
 
-bool Coursework::Frame()
+bool Procedural::Frame()
 {
   bool result;
 
@@ -208,7 +209,7 @@ bool Coursework::Frame()
 
 // -----------------------------------------------------------------------------
 
-bool Coursework::Render()
+bool Procedural::Render()
 {
   if (m_EffectStage == NORMAL_STAGE)
   {
@@ -236,7 +237,7 @@ bool Coursework::Render()
 
 // -----------------------------------------------------------------------------
 
-void Coursework::initLights()
+void Procedural::initLights()
 {
   m_Lights[0] = new Light;
   m_Lights[0]->SetDiffuseColour(0.25f, 0.25f, 0.25f, 1.0f);  // white
@@ -307,7 +308,7 @@ void Coursework::initLights()
 
 // -----------------------------------------------------------------------------
 
-void Coursework::renderToTexture()
+void Procedural::renderToTexture()
 {
   
 
@@ -323,7 +324,7 @@ void Coursework::renderToTexture()
 
 // -----------------------------------------------------------------------------
 
-void Coursework::renderOrthoMesh()
+void Procedural::renderOrthoMesh()
 {
   XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
   int renderState;
@@ -401,7 +402,7 @@ void Coursework::renderOrthoMesh()
 
 // -----------------------------------------------------------------------------
 
-void Coursework::drawGeometry()
+void Procedural::drawGeometry()
 {
   XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
@@ -463,7 +464,7 @@ void Coursework::drawGeometry()
     // Set shader parameters (matrices and texture)
     m_TessellationShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
       projectionMatrix, XMMatrixTranslation(0.0f, 0.0f, 0.0f),
-      m_Terrain->GetTexture(), m_Camera, 1.0f);
+      m_Terrain->GetTexture(), m_Camera, 64.0f);
     // Render object (combination of mesh geometry and shader process
     m_TessellationShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
   }

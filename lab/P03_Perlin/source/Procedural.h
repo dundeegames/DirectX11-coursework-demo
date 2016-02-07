@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
-* \file       Coursework.h
-* \brief      Coursework class
+* \file       Procedural.h
+* \brief      Procedural class
 *
 * \details     
 *
 * \author     Jiri Klic
 * \version    1.0
-* \date       November 2015
+* \date       February 2016
 * \pre        
 * \post       
 * \bug        No known bugs
@@ -22,8 +22,8 @@
 *///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef COURSEWORK_H
-#define COURSEWORK_H
+#ifndef PROCEDURAL_H
+#define PROCEDURAL_H
 
 
 // INCLUDES ////////////////////////////////////////////////////////////////////
@@ -37,20 +37,20 @@
 #include <System/Light.h>
 #include <System/ResourceManager.h>
 #include <System/RenderStateHelper.h>
+#include <System/RenderTexture.h>
 
-#include <Geometry/Deprecated/PointMesh.h>
 #include <Shaders/GeometryShader.h>
 #include <Shaders/TessellationShader.h>
 #include <Shaders/UberShader.h>
+#include <Shaders/TextureShader.h>
 
+#include <Geometry/Deprecated/PointMesh.h>
 #include <Geometry/Deprecated/CubeMesh.h>
 #include <Geometry/Deprecated/SphereMesh.h>
-#include <Geometry/Deprecated/TessellationMesh.h>
 #include <Geometry/Deprecated/OrthoMesh.h>
-#include <Geometry/Mesh.h>
 
-#include <System/RenderTexture.h>
-#include <Shaders/TextureShader.h>
+#include <Geometry/Mesh.h>
+#include <Geometry/TerrainMesh.h>
 
 // CLASS ///////////////////////////////////////////////////////////////////////
 
@@ -59,11 +59,11 @@ enum EffectStage { NORMAL_STAGE, GRAYSCALE_STAGE, INVERSE_STAGE, COLOURED_STAGE 
 
 
 
-class Coursework : public BaseApplication
+class Procedural : public BaseApplication
 {
 public:
-  Coursework();
-  ~Coursework();
+  Procedural();
+  ~Procedural();
 
   void init(HINSTANCE hinstance, HWND hwnd,
               int screenWidth, int screenHeight, Input *in);
@@ -85,7 +85,7 @@ private:
   TessellationShader* m_TessellationShader;
   SphereMesh* m_Mesh;
   CubeMesh* m_Cube;
-  TessellationMesh* m_Terrain;
+  TerrainMesh* m_Terrain;
   Mesh* m_PlaneMesh;
 
   Light* m_Lights[MAX_LIGHTS];
@@ -107,7 +107,7 @@ private:
 };
 
 
-#endif // COURSEWORK_H
+#endif // PROCEDURAL_H
 
 
 

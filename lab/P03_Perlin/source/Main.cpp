@@ -6,7 +6,7 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
   // Create the system object with Coursework
-  System* m_System = new System(new Coursework());
+  System* m_System = new System(new Procedural());
 	
 	// Initialize and run the system object.
 	m_System->Run();

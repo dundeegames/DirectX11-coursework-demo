@@ -92,6 +92,7 @@
     <ClCompile Include="..\source\Geometry\Deprecated\TessellationMesh.cpp" />
     <ClCompile Include="..\source\Geometry\Deprecated\TriangleMesh.cpp" />
     <ClCompile Include="..\source\Geometry\Mesh.cpp" />
+    <ClCompile Include="..\source\Geometry\TerrainMesh.cpp" />
     <ClCompile Include="..\source\Geometry\Texture.cpp" />
     <ClCompile Include="..\source\Shaders\BaseShader.cpp" />
     <ClCompile Include="..\source\Shaders\BoxBlurShader.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="..\source\Geometry\Deprecated\TessellationMesh.h" />
     <ClInclude Include="..\source\Geometry\Deprecated\TriangleMesh.h" />
     <ClInclude Include="..\source\Geometry\Mesh.h" />
+    <ClInclude Include="..\source\Geometry\TerrainMesh.h" />
     <ClInclude Include="..\source\Geometry\Texture.h" />
     <ClInclude Include="..\source\Shaders\BaseShader.h" />
     <ClInclude Include="..\source\Shaders\BoxBlurShader.h" />

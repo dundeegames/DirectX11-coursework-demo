@@ -62,13 +62,50 @@ void TessellationMesh::InitBuffers(ID3D11Device* device)
   D3D11_SUBRESOURCE_DATA vertexData, indexData;
 
 
+  //tempVertex.position = XMFLOAT3(-25.0f, 0.0f, 25.0f);  // Top Left
+  //tempVertex.texture = XMFLOAT2(0.0f, 0.0f);
+  //tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  //vertices.push_back(tempVertex);
+
+  //tempVertex.position = XMFLOAT3(-25.0f, 0.0f, -25.0f);  // Bottom left.
+  //tempVertex.texture = XMFLOAT2(0.0f, 1.0f);
+  //tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  //vertices.push_back(tempVertex);
+
+  //tempVertex.position = XMFLOAT3(0.0f, 0.0f, 25.0f);  // Top right C
+  //tempVertex.texture = XMFLOAT2(0.5f, 0.0f);
+  //tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  //vertices.push_back(tempVertex);
+
+
+  //tempVertex.position = XMFLOAT3(0.0f, 0.0f, -25.0f);  // Bottom right. C
+  //tempVertex.texture = XMFLOAT2(0.5f, 1.0f);
+  //tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  //vertices.push_back(tempVertex);
+
+  //tempVertex.position = XMFLOAT3(25.0f, 0.0f, 25.0f);  // Top right
+  //tempVertex.texture = XMFLOAT2(1.0f, 0.0f);
+  //tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  //vertices.push_back(tempVertex);
+
+
+  //tempVertex.position = XMFLOAT3(25.0f, 0.0f, -25.0f);  // Bottom right.
+  //tempVertex.texture = XMFLOAT2(1.0f, 1.0f);
+  //tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  //vertices.push_back(tempVertex);
+
+  ////Load the index vector with data.
+  //indices.push_back(0);
+  //indices.push_back(1);
+  //indices.push_back(2);
+  //indices.push_back(3);
+  //indices.push_back(2);
+  //indices.push_back(3);
+  //indices.push_back(4);
+  //indices.push_back(5);
+
   tempVertex.position = XMFLOAT3(-25.0f, 0.0f, 25.0f);  // Top Left
   tempVertex.texture = XMFLOAT2(0.0f, 0.0f);
-  tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-  vertices.push_back(tempVertex);
-
-  tempVertex.position = XMFLOAT3(-25.0f, 0.0f, -25.0f);  // Bottom left.
-  tempVertex.texture = XMFLOAT2(0.0f, 1.0f);
   tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
   vertices.push_back(tempVertex);
 
@@ -77,32 +114,41 @@ void TessellationMesh::InitBuffers(ID3D11Device* device)
   tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
   vertices.push_back(tempVertex);
 
-
-  tempVertex.position = XMFLOAT3(0.0f, 0.0f, -25.0f);  // Bottom right. C
-  tempVertex.texture = XMFLOAT2(0.5f, 1.0f);
-  tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-  vertices.push_back(tempVertex);
-
   tempVertex.position = XMFLOAT3(25.0f, 0.0f, 25.0f);  // Top right
   tempVertex.texture = XMFLOAT2(1.0f, 0.0f);
   tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
   vertices.push_back(tempVertex);
-
-
+  
+  tempVertex.position = XMFLOAT3(-25.0f, 0.0f, -25.0f);  // Bottom left.
+  tempVertex.texture = XMFLOAT2(0.0f, 1.0f);
+  tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  vertices.push_back(tempVertex);
+  
+  tempVertex.position = XMFLOAT3(0.0f, 0.0f, -25.0f);  // Bottom right. C
+  tempVertex.texture = XMFLOAT2(0.5f, 1.0f);
+  tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+  vertices.push_back(tempVertex);
+  
   tempVertex.position = XMFLOAT3(25.0f, 0.0f, -25.0f);  // Bottom right.
   tempVertex.texture = XMFLOAT2(1.0f, 1.0f);
   tempVertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
   vertices.push_back(tempVertex);
 
+
   //Load the index vector with data.
   indices.push_back(0);
+  indices.push_back(3);
   indices.push_back(1);
-  indices.push_back(2);
-  indices.push_back(3);
-  indices.push_back(2);
-  indices.push_back(3);
   indices.push_back(4);
+  indices.push_back(1);
+  indices.push_back(4);
+  indices.push_back(2);
   indices.push_back(5);
+
+
+
+
+
 
   // Set the number of vertices in the vertex array.
   m_vertexCount = vertices.size();

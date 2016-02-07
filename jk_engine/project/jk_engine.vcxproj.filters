@@ -151,6 +151,9 @@
     <ClCompile Include="..\source\Shaders\TextureShader.cpp">
       <Filter>Shaders\Deprecated</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\Geometry\TerrainMesh.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Geometry\Texture.h">
@@ -278,6 +281,9 @@
     </ClInclude>
     <ClInclude Include="..\source\Shaders\TextureShader.h">
       <Filter>Shaders\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Geometry\TerrainMesh.h">
+      <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
