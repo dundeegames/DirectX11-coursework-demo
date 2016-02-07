@@ -52,6 +52,8 @@ private:
   void InitBuffers(ID3D11Device* device);
 
 private:
+
+
   std::vector<VertexType> m_Vertices;
   std::vector<unsigned long> m_Indices;
 

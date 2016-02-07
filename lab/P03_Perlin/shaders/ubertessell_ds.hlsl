@@ -67,13 +67,6 @@ struct OutputType
 
 OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, const OutputPatch<InputType, 4> patch)
 {
-  float4 sampleColour;
-  //float4 whiteColour = float4(1.0f, 1.0f, 1.0f, 1.0f);
-  //float4 grayColour = float4(0.1f, 0.1f, 0.1f, 1.0f);
-  //float4 blackColour = float4(0.0f, 0.0f, 0.0f, 1.0f);
-  //float4 greenColour = float4(0.0f, 0.25f, 0.0f, 1.0f);
-  //float4 yellowColour = float4(0.5f, 0.5f, 0.0f, 1.0f);
-  //float4 blueColour = float4(0.0f, 0.0f, 1.0f, 1.0f);
   //float displacement = 5.0f;
   float displacement = 0.0f;
 
@@ -94,8 +87,21 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
   pos2 = lerp(patch[2].position, patch[3].position, 1 - uvwCoord.y);
   vertexPosition = lerp(pos1, pos2, uvwCoord.x);
 
+  nor1 = lerp(patch[0].normal, patch[1].normal, 1 - uvwCoord.y);
+  nor2 = lerp(patch[2].normal, patch[3].normal, 1 - uvwCoord.y);
+  vertexNormal = lerp(nor1, nor2, uvwCoord.x);
+
+
+
+  tex1 = lerp(patch[0].tex, patch[1].tex, 1 - uvwCoord.y);
+  tex2 = lerp(patch[2].tex, patch[3].tex, 1 - uvwCoord.y);
+  texturePosition = lerp(tex1, tex2, uvwCoord.x);
+
+  //vertexPosition.y = heightMap.SampleLevel(SampleType, texturePosition, 0).x * displacement;
+
+
   // Calculate the position of the vertex in the world.
-  worldPosition = mul(vertexPosition, worldMatrix);
+  worldPosition.xyz = mul(vertexPosition, (float3x3)worldMatrix);
 
   // Determine the viewing direction based on the position of the camera
   // and the position of the vertex in the world.
@@ -103,39 +109,10 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
 
   // Normalize the viewing direction vector.
   output.viewDirection = normalize(output.viewDirection);
+
+
+  // Store the position of the vertex in the world.
   output.position3D = worldPosition.xyz;
-
-  nor1 = lerp(patch[0].normal, patch[1].normal, 1 - uvwCoord.y);
-  nor2 = lerp(patch[2].normal, patch[3].normal, 1 - uvwCoord.y);
-  vertexNormal = lerp(nor1, nor2, uvwCoord.x);
-  
-  tex1 = lerp(patch[0].tex, patch[1].tex, 1 - uvwCoord.y);
-  tex2 = lerp(patch[2].tex, patch[3].tex, 1 - uvwCoord.y);
-  texturePosition = lerp(tex1, tex2, uvwCoord.x);
-
-  //pos1 = lerp(patch[0].position, patch[1].position, uvwCoord.x);
-  //pos2 = lerp(patch[2].position, patch[3].position, uvwCoord.x);
-  //vertexPosition = lerp(pos1, pos2, uvwCoord.y);
-
-  //tex1 = lerp(patch[0].tex, patch[1].tex, uvwCoord.x);
-  //tex2 = lerp(patch[2].tex, patch[3].tex, uvwCoord.x);
-  //texturePosition = lerp(tex1, tex2, uvwCoord.y);
-
-
-  vertexPosition.y = heightMap.SampleLevel(SampleType, texturePosition, 0).x * displacement;
-
-  //if (vertexPosition.y > (0.7f * displacement))
-  //{
-  //  output.colour = whiteColour;
-  //}
-  //else if (vertexPosition.y < (0.3f * displacement))
-  //{
-  //  output.colour = lerp(blueColour, yellowColour, (vertexPosition.y / (0.3f * displacement) ));
-  //}
-  //else
-  //{
-  //  output.colour = lerp(yellowColour, greenColour, (vertexPosition.y / (0.4f * displacement) ));
-  //}
 
 
   // Calculate the position of the new vertex against the world, view, and projection matrices.
@@ -143,10 +120,14 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
   output.position = mul(output.position, viewMatrix);
   output.position = mul(output.position, projectionMatrix);
 
-  // Calculate and Normalize the normal vector against the world matrix only.
-  output.normal = normalize(mul(vertexNormal, (float3x3)worldMatrix));
-
+  // Store the texture coordinates for the pixel shader.
   output.tex = texturePosition;
+
+  // Calculate the normal vector against the world matrix only.
+  output.normal = mul(vertexNormal, (float3x3)worldMatrix);
+
+  // Normalize the normal vector.
+  output.normal = normalize(output.normal);
 
 
   // Send the output into the pixel shader

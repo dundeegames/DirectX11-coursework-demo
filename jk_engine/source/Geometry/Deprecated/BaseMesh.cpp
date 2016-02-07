@@ -34,9 +34,9 @@
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
 
 
-BaseMesh::BaseMesh()
+BaseMesh::BaseMesh() : m_Texture(nullptr)
 {
-  m_Texture = nullptr;
+
 }
 
 

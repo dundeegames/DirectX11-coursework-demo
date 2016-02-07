@@ -44,7 +44,8 @@ TerrainMesh::TerrainMesh(ID3D11Device* device, WCHAR* textureFilename,
   InitBuffers(device);
 
   // Load the texture for this model.
-  LoadTexture(device, textureFilename);
+  //LoadTexture(device, textureFilename);
+  // Create the texture object.
 }
 
 
@@ -70,7 +71,7 @@ void TerrainMesh::GeneratePatch(float width, float height, int subW, int subH)
 
   XMFLOAT3 position = XMFLOAT3(0.0f, 0.0f, 0.0f);
   XMFLOAT2 UV = XMFLOAT2(0.0f, 0.0f);
-  XMFLOAT3 normal = XMFLOAT3(0.0f, 0.0f, -1.0f);  // Default
+  XMFLOAT3 normal = XMFLOAT3(0.0f, 1.0f, 0.0f);  // Default
 
   for (int j = 0; j < column; j++)
   {

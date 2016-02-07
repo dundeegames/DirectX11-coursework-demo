@@ -65,19 +65,19 @@ float4 main(InputType input) : SV_TARGET
   float lightIntensity = (float)0;
   float4 finalColour = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-    float3 reflection = (float3)0;
-    float4 specularFX = (float4)0;
-    float4 finalSpec = (float4)0;
+  float3 reflection = (float3)0;
+  float4 specularFX = (float4)0;
+  float4 finalSpec = (float4)0;
 
 
-    // Set the default output colour to the ambient light value for all pixels.
-    for (int a = 0; a < MAX_LIGHTS; a++)
+  // Set the default output colour to the ambient light value for all pixels.
+  for (int a = 0; a < MAX_LIGHTS; a++)
+  {
+    if (lightData[a].isActive == SWITCH_ON)
     {
-      if (lightData[a].isActive == SWITCH_ON)
-      {
-        finalColour += lightData[a].ambient;
-      }
+      finalColour += lightData[a].ambient;
     }
+  }
   finalColour = saturate(finalColour);
 
 

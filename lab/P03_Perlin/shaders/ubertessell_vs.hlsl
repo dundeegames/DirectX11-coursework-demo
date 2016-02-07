@@ -50,8 +50,8 @@ OutputType main(InputType input)
   output.position = input.position;
   output.normal = input.normal;
 
-  output.tex = mul(input.tex, TextureMatrix);
-  //output.tex = input.tex;
+  //output.tex = mul(input.tex, TextureMatrix);
+  output.tex = input.tex;
 
     
   return output;

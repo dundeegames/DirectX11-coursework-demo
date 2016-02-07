@@ -287,9 +287,9 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
     // Now set the constant buffer in the vertex shader with the updated values.
     deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
   }
-
-
+  
   // CAMERA: ---------
+
   // Lock the constant buffer so it can be written to.
   result = deviceContext->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
@@ -318,8 +318,7 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
 
     // Now set the constant buffer in the domain shader
     deviceContext->DSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
-
-
+    
   }
   else
   {
@@ -329,9 +328,7 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
     // Now set the constant buffer in the vertex shader with the updated values.
     deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
   }
-
-
-
+  
 
   // LIGHTS: ---------
   if (m_Lights.size() > 0)
