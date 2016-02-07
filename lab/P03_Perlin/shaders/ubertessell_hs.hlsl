@@ -1,7 +1,29 @@
-// Tessellation Hull Shader
-// Prepares control points for tessellation
+////////////////////////////////////////////////////////////////////////////////
+/**
+* \file       ubertessell_vs.hlsl
+* \brief      Uber Tessellation Hull Shader
+*
+* \details    Prepares control points for tessellation
+*
+* \author     Jiri Klic
+* \version    1.0
+* \date       February 2016
+* \pre
+* \post
+* \bug        No known bugs
+* \warning
+* \todo
+*
+* \copyright  University of Abertay - Dundee.2013.
+*             Intellectual Property Policy.[online].Available from:
+*             http://www.abertay.ac.uk/media/Intellectual-Property-Policy-v2-01.pdf
+*             [Accessed 22 April 2015].
+*
+*///////////////////////////////////////////////////////////////////////////////
 
-cbuffer TessellationBuffer : register(cb)
+
+
+cbuffer CameraBuffer : register(cb0)
 {
   float3 cameraPosition;
   float tessellationFactor;    
@@ -11,7 +33,7 @@ struct InputType
 {
   float3 position : POSITION;
   float2 tex : TEXCOORD0;
-  float4 colour : COLOR;
+  float3 normal : NORMAL;
 };
 
 struct ConstantOutputType
@@ -24,7 +46,7 @@ struct OutputType
 {
   float3 position : POSITION;
   float2 tex : TEXCOORD0;
-  float4 colour : COLOR;
+  float3 normal : NORMAL;
 };
 
 ConstantOutputType PatchConstantFunction(InputPatch<InputType, 4> inputPatch, uint patchId : SV_PrimitiveID)
@@ -62,7 +84,7 @@ OutputType main(InputPatch<InputType, 4> patch, uint pointId : SV_OutputControlP
     output.tex = patch[pointId].tex;
 
     // Set the input color as the output color.
-    output.colour = patch[pointId].colour;
+    output.normal = patch[pointId].normal;
 
     return output;
 }

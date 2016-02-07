@@ -307,11 +307,19 @@ void UberTessellShader::setView(ID3D11DeviceContext* deviceContext,
   // if Hull shader is not null then set DS, else set VS
   if (m_hullShader)
   {
-    // Set the position of the constant buffer in the vertex shader.
+    // Set the position of the constant buffer in the hull shader.
     bufferNumber = 0;
 
     // Now set the constant buffer in the hull shader with the updated values.
     deviceContext->HSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+
+    // Set the position of the constant buffer in the domain shader.
+    bufferNumber = 1;
+
+    // Now set the constant buffer in the domain shader
+    deviceContext->DSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+
+
   }
   else
   {

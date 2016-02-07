@@ -82,7 +82,8 @@ private:
   GeometryShader* m_GeometryShader;
   PointMesh* m_PointMesh;
 
-  UberShader* m_UberShader;
+  //UberShader* m_UberShader;
+  UberTessellShader* m_UberShader;
   TessellationShader* m_TessellationShader;
   UberTessellShader* m_UberTessellShader;
 
