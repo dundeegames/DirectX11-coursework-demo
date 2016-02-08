@@ -28,8 +28,8 @@
 // INCLUDES ////////////////////////////////////////////////////////////////////
 #include"MeshGenerator.h"
 
-#define LEFT_OFFSET -0.5f
-#define TOP_OFFSET 0.5f
+
+
 
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
 
@@ -116,31 +116,33 @@ Mesh* MeshGenerator::getQuad(float width, float height)
 
 Mesh* MeshGenerator::getPlane(float width, float height, int subW, int subH, PlaneType type)
 {
-  //makePlane(subX, subY, type);
+  const float LEFT_OFFSET = width * (-0.5f);
+  const float TOP_OFFSET = height * 0.5f;
 
-  float dW = (1.0f / (float)subW);
-  float dH = (1.0f / (float)subH);
+  float dU = (1.0f / (float)subW);
+  float dV = (1.0f / (float)subH);
+  float dW = width * dU;
+  float dH = height * dV;
   int row = (subW + 1);
   int column = (subH + 1);
 
   XMFLOAT3 position = XMFLOAT3(0.0f, 0.0f, 0.0f);
   XMFLOAT2 UV = XMFLOAT2(0.0f, 0.0f);
-  XMFLOAT3 normal = XMFLOAT3(0.0f, 0.0f, -1.0f);  // Default
+  XMFLOAT3 normal = XMFLOAT3(0.0f, 1.0f, 0.0f);  // Default
 
   for (int j = 0; j < column; j++)
   {
     for (int i = 0; i < row; i++)
     {
       position.x = LEFT_OFFSET + (i * dW);
-      position.y = TOP_OFFSET - (j * dH);
-      UV.x = (i * dW);
-      UV.y = (j * dH);
+      position.z = TOP_OFFSET - (j * dH);
+      UV.x = (i * dU);
+      UV.y = (j * dV);
 
       // Load the vertex array with data.
       vertices.push_back({ position, UV, normal });
     }
   }
-
 
   for (int j = 0; j < subH; j++)
   {
@@ -159,7 +161,6 @@ Mesh* MeshGenerator::getPlane(float width, float height, int subW, int subH, Pla
 
 
   Mesh* mesh = compileMesh();
-  mesh->setScale(width, height, 1.0f);
 
   return mesh;
 }

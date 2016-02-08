@@ -117,14 +117,13 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
 
   MeshGenerator meshGen = MeshGenerator(m_Direct3D->GetDevice());
-  m_PlaneMesh = meshGen.getPlane(50.0f, 50.0f, 50, 50);
+  m_PlaneMesh = meshGen.getPlane(50.0f, 50.0f, 64, 64);
   //m_PlaneMesh->setTexture(m_ResourceManager.getTexture(m_Direct3D->GetDevice(), L"brick1.dds"));
   m_PlaneMesh->setPosition(0.0f, -2.0f, 0.0f);
-  m_PlaneMesh->setRotation(90.0f, 0.0f, 0.0f);
 
 
   m_Terrain = new TerrainMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg",
-                              50.0f, 50.0f, 32, 32);
+                              50.0f, 50.0f, 8, 8);
 
   m_TessellationShader = new TessellationShader(m_Direct3D->GetDevice(), hwnd);
   m_TessellationShader->InitShader(L"shaders/tessellation_vs.hlsl", L"shaders/tessellation_hs.hlsl",
@@ -479,7 +478,7 @@ void Procedural::drawGeometry()
   else
   {
     m_UberTessellShader->setCamera(m_Camera);
-    m_UberTessellShader->setFixedTessellation(4.0f);
+    m_UberTessellShader->setFixedTessellation(8.0f);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
