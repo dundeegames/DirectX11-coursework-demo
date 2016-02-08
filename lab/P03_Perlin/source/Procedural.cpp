@@ -456,7 +456,8 @@ void Procedural::drawGeometry()
     m_PlaneMesh->SendData(m_Direct3D->GetDeviceContext());
     m_UberShader->setTexture(m_PlaneMesh->GetTexture());
     // Get Mesh position
-    worldMatrix = m_PlaneMesh->getWorldMatrix();
+    //worldMatrix = m_PlaneMesh->getWorldMatrix();
+    worldMatrix = XMMatrixIdentity();
     // Set shader parameters
     m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
                           projectionMatrix, XMMatrixIdentity());
