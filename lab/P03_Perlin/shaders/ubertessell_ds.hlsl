@@ -101,7 +101,7 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
 
 
   // Calculate the position of the vertex in the world.
-  worldPosition.xyz = mul(vertexPosition, (float3x3)worldMatrix);
+  worldPosition = mul(float4(vertexPosition, 1.0f), worldMatrix);
 
   // Determine the viewing direction based on the position of the camera
   // and the position of the vertex in the world.
