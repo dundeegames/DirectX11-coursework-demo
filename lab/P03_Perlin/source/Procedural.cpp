@@ -40,8 +40,9 @@ Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_TextPosition(0.0f, 20.0f), m_Mesh(nullptr),
                            m_UberShader(nullptr), m_Cube(nullptr),
                            m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
+                           m_OrthoHeightMeshBig(nullptr), m_OrthoHeightMeshSmall(nullptr),
                            m_Terrain(nullptr), m_TessellationShader(nullptr),
-                           m_UberTessellShader(nullptr),
+                           m_UberTessellShader(nullptr), m_HeightMap(nullptr),
                            m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
@@ -71,6 +72,7 @@ Procedural::~Procedural()
   DELETE_OBJECT(m_RendStateHelp);
 
   DELETE_OBJECT(m_RenderTexture);
+  DELETE_OBJECT(m_HeightMap);
   DELETE_OBJECT(m_TextureShader);
   DELETE_OBJECT(m_OrthoMesh);
 
@@ -142,6 +144,18 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
   
   initLights();
+
+  // RenderTexture, OrthoMesh and shader set for different renderTarget
+  m_HeightMap = new RenderTexture(m_Direct3D->GetDevice(), 1024, 1024, SCREEN_NEAR, SCREEN_DEPTH);
+
+  // ortho size and position set based on window size
+  // 200x200 pixels (standard would be matching window size for fullscreen mesh
+  // Position default at 0x0 centre window, to offset change values (pixel)
+  m_OrthoHeightMeshSmall = new OrthoMesh(m_Direct3D->GetDevice(), 128, 128);
+  m_OrthoHeightMeshBig = new OrthoMesh(m_Direct3D->GetDevice(), 1024, 1024);
+
+
+
 
 
   // RenderTexture, OrthoMesh and shader set for different renderTarget

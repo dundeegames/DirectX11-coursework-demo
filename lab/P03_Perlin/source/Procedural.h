@@ -87,6 +87,9 @@ private:
   TessellationShader* m_TessellationShader;
   UberTessellShader* m_UberTessellShader;
 
+  RenderTexture* m_HeightMap;
+  OrthoMesh* m_OrthoHeightMeshBig;
+  OrthoMesh* m_OrthoHeightMeshSmall;
 
   SphereMesh* m_Mesh;
   CubeMesh* m_Cube;

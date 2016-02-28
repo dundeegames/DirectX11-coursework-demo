@@ -79,9 +79,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\PerlinNoise.cpp" />
     <ClCompile Include="source\Procedural.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\PerlinNoise.h" />
     <ClInclude Include="source\Procedural.h" />
   </ItemGroup>
   <ItemGroup>
