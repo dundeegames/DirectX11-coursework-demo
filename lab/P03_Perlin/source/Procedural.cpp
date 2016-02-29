@@ -139,7 +139,7 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
   m_UberTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
   m_UberTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
-                                  L"shaders/ubertessell_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
+                                  L"shaders/ubertessellperlin_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
 
 
   
