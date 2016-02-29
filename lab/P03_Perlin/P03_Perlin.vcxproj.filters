@@ -79,5 +79,8 @@
     <FxCompile Include="shaders\ubertessell_vs.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\ubertessellperlin_ds.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
