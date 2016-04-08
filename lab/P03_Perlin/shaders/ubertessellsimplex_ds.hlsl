@@ -43,7 +43,7 @@
 
 
 // DEFINES /////////////////////////////////////////////////////////////////////
-#define FASTFLOOR(x) ( ((x)>0) ? ((int)x) : (((int)x)-1) )
+//#define FASTFLOOR(x) ( ((x)>0) ? ((int)x) : (((int)x)-1) )
 
 // 2D Simplex Noise
 #define F2 0.366025403          // F2 = 0.5f *( sqrt(3.0f) - 1.0f)
@@ -60,7 +60,8 @@
 
 #define SCALE_FACTOR1D 0.25f    // TODO: The scale factors are preliminary!
 #define SCALE_FACTOR2D 40.0f
-#define SCALE_FACTOR3D 32.0f
+#define SCALE_FACTOR3D 12.0f
+//#define SCALE_FACTOR3D 32.0f
 #define SCALE_FACTOR4D 27.0f
 
 // DATA ////////////////////////////////////////////////////////////////////////
@@ -82,7 +83,7 @@
 * A vector-valued noise over 3D accesses it 96 times, and a
 * float-valued 4D noise 64 times. We want this to fit in the cache!
 */
-uint perm[512] = { 151, 160, 137, 91, 90, 15,
+static const int perm[512] = { 151, 160, 137, 91, 90, 15,
   131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
   190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
   88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
@@ -115,7 +116,7 @@ uint perm[512] = { 151, 160, 137, 91, 90, 15,
 // A lookup table to traverse the simplex around a given point in 4D.
 // Details can be found where this table is used, in the 4D noise method.
 /* TODO: This should not be required, backport it from Bill's GLSL code! */
-static uint simplex[64][4] = {
+static const int simplex[64][4] = {
   { 0, 1, 2, 3 }, { 0, 1, 3, 2 }, { 0, 0, 0, 0 }, { 0, 2, 3, 1 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 1, 2, 3, 0 },
   { 0, 2, 1, 3 }, { 0, 0, 0, 0 }, { 0, 3, 1, 2 }, { 0, 3, 2, 1 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 1, 3, 2, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
@@ -221,7 +222,7 @@ float  grad4(int hash, float x, float y, float z, float t)
 // 1D simplex noise
 float snoise1(float x)
 {
-  int i0 = FASTFLOOR(x);
+  int i0 = floor(x);
   int i1 = i0 + 1;
   float x0 = x - i0;
   float x1 = x0 - 1.0f;
@@ -257,8 +258,8 @@ float snoise2(float x, float y)
   float s = (x + y) * F2;       // Hairy factor for 2D
   float xs = x + s;
   float ys = y + s;
-  int i = FASTFLOOR(xs);
-  int j = FASTFLOOR(ys);
+  int i = floor(xs);
+  int j = floor(ys);
 
   float t = (float)(i + j) * G2;
   float X0 = i - t;             // Unskew the cell origin back to (x,y) space
@@ -346,9 +347,9 @@ float snoise3(float x, float y, float z)
   float xs = x + s;
   float ys = y + s;
   float zs = z + s;
-  int i = FASTFLOOR(xs);
-  int j = FASTFLOOR(ys);
-  int k = FASTFLOOR(zs);
+  int i = floor(xs);
+  int j = floor(ys);
+  int k = floor(zs);
 
   float t = (float)(i + j + k)*G3;
   float X0 = i - t; // Unskew the cell origin back to (x,y,z) space
@@ -479,10 +480,10 @@ float snoise4(float x, float y, float z, float w)
   float ys = y + s;
   float zs = z + s;
   float ws = w + s;
-  int i = FASTFLOOR(xs);
-  int j = FASTFLOOR(ys);
-  int k = FASTFLOOR(zs);
-  int l = FASTFLOOR(ws);
+  int i = floor(xs);
+  int j = floor(ys);
+  int k = floor(zs);
+  int l = floor(ws);
 
   float t = (i + j + k + l) * G4; // Factor for 4D unskewing
   float X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space
@@ -622,73 +623,18 @@ float snoise4(float x, float y, float z, float w)
 }
 
 
-
-
-// old..
-
-//void initNoise(int* p)
-//{
-//  // init noise
-//  p = new int[512];
-//
-//  for (int i = 0; i < 256; i++)
-//  {
-//    p[256 + i] = p[i] = permutation[i];
-//  }
-//}
-
-// -----------------------------------------------------------------------------
-
-float fade(float t)
-{
-  return t * t * t * (t * (t * 6 - 15) + 10);
-}
-
-// -----------------------------------------------------------------------------
-
-//float lerp(float t, float a, float b)
-//{
-//  return a + t * (b - a);
-//}
-
-// -----------------------------------------------------------------------------
-
-//float grad(int hash, float x, float y, float z)
-//{
-//  int h = hash & 15;                     // CONVERT LO 4 BITS OF HASH CODE
-//
-//  float u = h<8 ? x : y,                 // INTO 12 GRADIENT DIRECTIONS.
-//    v = h<4 ? y : h == 12 || h == 14 ? x : z;
-//
-//  return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
-//
-//}
-
 // -----------------------------------------------------------------------------
 
 
 
 
 
-
-
-
-
-// -----------------------------------------------------------------------------
-
+// SHADER //////////////////////////////////////////////////////////////////////
 
 [domain("quad")]
 
 OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, const OutputPatch<InputType, 4> patch)
 {
-
-
-
-
-
-
-
-  //float displacement = 5.0f;
   float displacement = 0.0f;
 
   float3 vertexPosition, pos1, pos2;
@@ -708,11 +654,15 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
   pos2 = lerp(patch[2].position, patch[3].position, 1 - uvwCoord.y);
   vertexPosition = lerp(pos1, pos2, uvwCoord.x);
 
+  displacement = snoise3(vertexPosition.x, vertexPosition.y, vertexPosition.z);
+  vertexPosition.y += displacement;
+
+
   nor1 = lerp(patch[0].normal, patch[1].normal, 1 - uvwCoord.y);
   nor2 = lerp(patch[2].normal, patch[3].normal, 1 - uvwCoord.y);
   vertexNormal = lerp(nor1, nor2, uvwCoord.x);
 
-
+  vertexNormal.y += displacement;
 
   tex1 = lerp(patch[0].tex, patch[1].tex, 1 - uvwCoord.y);
   tex2 = lerp(patch[2].tex, patch[3].tex, 1 - uvwCoord.y);

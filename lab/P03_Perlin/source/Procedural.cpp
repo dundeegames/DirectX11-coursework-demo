@@ -486,7 +486,7 @@ void Procedural::drawGeometry()
   else
   {
     m_UberTessellShader->setCamera(m_Camera);
-    m_UberTessellShader->setFixedTessellation(8.0f);
+    m_UberTessellShader->setFixedTessellation(64.0f);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
@@ -494,7 +494,7 @@ void Procedural::drawGeometry()
     m_UberTessellShader->setTexture(nullptr);
     m_UberTessellShader->setHeightmap(nullptr);
 
-    worldMatrix = XMMatrixTranslation(0.0f, -2.0f, 0.0f);
+    worldMatrix = XMMatrixScaling(5.0f, 1.0f, 5.0f) * XMMatrixTranslation(0.0f, -2.0f, 0.0f);
     // Set shader parameters
     m_UberTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
       projectionMatrix, XMMatrixIdentity());
