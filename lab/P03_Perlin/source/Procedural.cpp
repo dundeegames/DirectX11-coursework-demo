@@ -41,8 +41,7 @@ Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_UberShader(nullptr), m_Cube(nullptr),
                            m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
                            m_OrthoHeightMeshBig(nullptr), m_OrthoHeightMeshSmall(nullptr),
-                           m_Terrain(nullptr), m_TessellationShader(nullptr),
-                           m_UberTessellShader(nullptr), m_HeightMap(nullptr),
+                           m_Terrain(nullptr), m_UberTessellShader(nullptr), m_HeightMap(nullptr),
                            m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
@@ -62,7 +61,6 @@ Procedural::~Procedural()
   // Release the Direct3D object.
   DELETE_OBJECT(m_PointMesh);
   DELETE_OBJECT(m_GeometryShader);
-  DELETE_OBJECT(m_TessellationShader);
   DELETE_OBJECT(m_UberTessellShader);
   DELETE_OBJECT(m_Mesh);
   DELETE_OBJECT(m_Cube);
@@ -126,10 +124,6 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
   m_Terrain = new TerrainMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg",
                               50.0f, 50.0f, 8, 8);
-
-  m_TessellationShader = new TessellationShader(m_Direct3D->GetDevice(), hwnd);
-  m_TessellationShader->InitShader(L"shaders/tessellation_vs.hlsl", L"shaders/tessellation_hs.hlsl",
-                                   L"shaders/tessellation_ds.hlsl", L"shaders/tessellation_ps.hlsl");
 
   
   //m_UberShader = new UberShader(m_Direct3D->GetDevice(), hwnd);

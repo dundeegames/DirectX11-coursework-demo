@@ -43,18 +43,6 @@
     <FxCompile Include="shaders\quad_vs.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\tessellation_ds.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\tessellation_hs.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\tessellation_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\tessellation_vs.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\texture_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>

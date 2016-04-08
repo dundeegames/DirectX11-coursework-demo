@@ -84,7 +84,6 @@ private:
 
   //UberShader* m_UberShader;
   UberTessellShader* m_UberShader;
-  TessellationShader* m_TessellationShader;
   UberTessellShader* m_UberTessellShader;
 
   RenderTexture* m_HeightMap;
