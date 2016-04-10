@@ -38,10 +38,10 @@
 Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_SpriteBatch(nullptr), m_SpriteFont(nullptr),
                            m_TextPosition(0.0f, 20.0f), m_Mesh(nullptr),
-                           m_UberShader(nullptr), m_Cube(nullptr),
+                           m_UberShader(nullptr),
                            m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
                            m_OrthoHeightMeshBig(nullptr), m_OrthoHeightMeshSmall(nullptr),
-                           m_Terrain(nullptr), m_UberTessellShader(nullptr), m_HeightMap(nullptr),
+                           m_Terrain(nullptr), m_UberTessellShader(nullptr),
                            m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
@@ -63,14 +63,12 @@ Procedural::~Procedural()
   DELETE_OBJECT(m_GeometryShader);
   DELETE_OBJECT(m_UberTessellShader);
   DELETE_OBJECT(m_Mesh);
-  DELETE_OBJECT(m_Cube);
   DELETE_OBJECT(m_PlaneMesh);
   DELETE_OBJECT(m_Terrain);
   DELETE_OBJECT(m_UberShader);
   DELETE_OBJECT(m_RendStateHelp);
 
   DELETE_OBJECT(m_RenderTexture);
-  DELETE_OBJECT(m_HeightMap);
   DELETE_OBJECT(m_TextureShader);
   DELETE_OBJECT(m_OrthoMesh);
 
@@ -113,17 +111,16 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
   // Create Mesh object
   m_Mesh = new SphereMesh(m_Direct3D->GetDevice(), L"../media/DefaultDiffuse.png");
-  m_Cube = new CubeMesh(m_Direct3D->GetDevice(), L"../media/brick1.dds");
 
 
   MeshGenerator meshGen = MeshGenerator(m_Direct3D->GetDevice());
-  m_PlaneMesh = meshGen.getPlane(50.0f, 50.0f, 64, 64);
+  m_PlaneMesh = meshGen.getPlane(500.0f, 500.0f, 8, 8);
   //m_PlaneMesh->setTexture(m_ResourceManager.getTexture(m_Direct3D->GetDevice(), L"brick1.dds"));
-  m_PlaneMesh->setPosition(0.0f, -2.0f, 0.0f);
+  //m_PlaneMesh->setPosition(0.0f, -2.0f, 0.0f);
 
 
   m_Terrain = new TerrainMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg",
-                              50.0f, 50.0f, 8, 8);
+                              50.0f, 50.0f, 512, 512);
 
   
   //m_UberShader = new UberShader(m_Direct3D->GetDevice(), hwnd);
@@ -139,8 +136,6 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
   
   initLights();
 
-  // RenderTexture, OrthoMesh and shader set for different renderTarget
-  m_HeightMap = new RenderTexture(m_Direct3D->GetDevice(), 1024, 1024, SCREEN_NEAR, SCREEN_DEPTH);
 
   // ortho size and position set based on window size
   // 200x200 pixels (standard would be matching window size for fullscreen mesh
@@ -258,7 +253,8 @@ void Procedural::initLights()
   m_Lights[0] = new Light;
   m_Lights[0]->SetDiffuseColour(0.25f, 0.25f, 0.25f, 1.0f);  // white
   m_Lights[0]->SetAmbientColour(0.5f, 0.5f, 0.5f, 1.0f); // gray
-  m_Lights[0]->SetPosition(5.0f, 5.0f, 0.0f);
+  m_Lights[0]->SetPosition(0.0f, 5.0f, 0.0f);
+  //m_Lights[0]->SetSpecularColour(0.0f, 0.0f, 0.0f, 1.0f);  // no specular
   m_Lights[0]->SetSpecularColour(0.5f, 0.5f, 0.5f, 1.0f);  // white
   m_Lights[0]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[0]);
@@ -266,15 +262,16 @@ void Procedural::initLights()
   m_Lights[1] = new Light;
   m_Lights[1]->SetDiffuseColour(0.5f, 0.25f, 0.25f, 1.0f);  // light red
   m_Lights[1]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[1]->SetPosition(-15.0f, 1.0f, 15.0f);
-  m_Lights[1]->SetSpecularColour(0.75f, 0.0f, 0.0f, 1.0f);  // red
+  m_Lights[1]->SetPosition(150.0f, 50.0f, 15.0f);
+  //m_Lights[1]->SetSpecularColour(0.75f, 0.0f, 0.0f, 1.0f);  // red
+  m_Lights[1]->SetSpecularColour(0.0f, 0.0f, 0.0f, 1.0f);  // no specular
   m_Lights[1]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[1]);
 
   m_Lights[2] = new Light;
   m_Lights[2]->SetDiffuseColour(0.25f, 0.25f, 0.5f, 1.0f);  // light blue
   m_Lights[2]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[2]->SetPosition(15.0f, 1.0f, 15.0f);
+  m_Lights[2]->SetPosition(15.0f, 5.0f, 15.0f);
   m_Lights[2]->SetSpecularColour(0.0f, 0.0f, 0.75f, 1.0f);  // blue
   m_Lights[2]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[2]);
@@ -282,7 +279,7 @@ void Procedural::initLights()
   m_Lights[3] = new Light;
   m_Lights[3]->SetDiffuseColour(0.0f, 0.2f, 0.0f, 1.0f);  // green
   m_Lights[3]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[3]->SetPosition(-15.0f, 1.0f, -15.0f);
+  m_Lights[3]->SetPosition(-15.0f, 5.0f, -15.0f);
   m_Lights[3]->SetSpecularColour(0.0f, 0.5f, 0.0f, 1.0f);  // green
   m_Lights[3]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[3]);
@@ -290,7 +287,7 @@ void Procedural::initLights()
   m_Lights[4] = new Light;
   m_Lights[4]->SetDiffuseColour(0.2f, 0.2f, 0.0f, 1.0f);  // light yellow
   m_Lights[4]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[4]->SetPosition(15.0f, 1.0f, -15.0f);
+  m_Lights[4]->SetPosition(15.0f, 5.0f, -15.0f);
   m_Lights[4]->SetSpecularColour(0.5f, 0.5f, 0.0f, 1.0f);  // yellow
   m_Lights[4]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[4]);
@@ -298,7 +295,7 @@ void Procedural::initLights()
   m_Lights[5] = new Light;
   m_Lights[5]->SetDiffuseColour(0.2f, 0.1f, 0.0f, 1.0f);  // orange
   m_Lights[5]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[5]->SetPosition(0.0f, 1.0f, -15.0f);
+  m_Lights[5]->SetPosition(0.0f, 5.0f, -15.0f);
   m_Lights[5]->SetSpecularColour(0.5f, 0.25f, 0.0f, 1.0f);  // orange
   m_Lights[5]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[5]);
@@ -306,7 +303,7 @@ void Procedural::initLights()
   m_Lights[6] = new Light;
   m_Lights[6]->SetDiffuseColour(0.2f, 0.0f, 0.2f, 1.0f);  // violet
   m_Lights[6]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[6]->SetPosition(0.0f, 1.0f, 15.0f);
+  m_Lights[6]->SetPosition(0.0f, 5.0f, 15.0f);
   m_Lights[6]->SetSpecularColour(0.5f, 0.0f, 0.5f, 1.0f);  // violet
   m_Lights[6]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[6]);
@@ -430,6 +427,7 @@ void Procedural::drawGeometry()
   m_Camera->GetViewMatrix(viewMatrix);
   m_Direct3D->GetProjectionMatrix(projectionMatrix);
 
+  worldMatrix = XMMatrixTranslation(0.0f, 2.0f, 0.0f);
 
   // Send geometry data (from mesh)
   m_PointMesh->SendData(m_Direct3D->GetDeviceContext());
@@ -449,7 +447,7 @@ void Procedural::drawGeometry()
   m_UberShader->setTexture(m_Mesh->GetTexture());
   // Get Mesh position
   //worldMatrix = XMMatrixTranslation(-1.5f, 0.0f, 0.0f);
-  worldMatrix = XMMatrixScaling(2.0f, 2.0f, 2.0f);
+  worldMatrix = XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 2.0f, 0.0f);
   // Set shader parameters
   m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
     projectionMatrix, XMMatrixIdentity());
@@ -486,7 +484,7 @@ void Procedural::drawGeometry()
   else
   {
     m_UberTessellShader->setCamera(m_Camera);
-    m_UberTessellShader->setFixedTessellation(64.0f);
+    m_UberTessellShader->setFixedTessellation(1.0f);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
@@ -494,7 +492,7 @@ void Procedural::drawGeometry()
     m_UberTessellShader->setTexture(nullptr);
     m_UberTessellShader->setHeightmap(nullptr);
 
-    worldMatrix = XMMatrixScaling(5.0f, 1.0f, 5.0f) * XMMatrixTranslation(0.0f, -2.0f, 0.0f);
+    worldMatrix = XMMatrixScaling(100.0f, 20.0f, 100.0f);
     // Set shader parameters
     m_UberTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
       projectionMatrix, XMMatrixIdentity());

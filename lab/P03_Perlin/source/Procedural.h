@@ -86,12 +86,10 @@ private:
   UberTessellShader* m_UberShader;
   UberTessellShader* m_UberTessellShader;
 
-  RenderTexture* m_HeightMap;
   OrthoMesh* m_OrthoHeightMeshBig;
   OrthoMesh* m_OrthoHeightMeshSmall;
 
   SphereMesh* m_Mesh;
-  CubeMesh* m_Cube;
   TerrainMesh* m_Terrain;
   Mesh* m_PlaneMesh;
 
