@@ -167,6 +167,9 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
   m_TextureShader = new TextureShader(m_Direct3D->GetDevice(), hwnd);
   m_TextureShader->InitShader(L"shaders/texture_vs.hlsl", L"shaders/texture_ps.hlsl");
 
+
+  tessellationLevel = 8.0f;
+
 }
 
 // -----------------------------------------------------------------------------
@@ -212,7 +215,25 @@ bool Procedural::Frame()
     m_RenderStage = DISPLACEMENT_ON_STAGE;
   }
 
+  if (m_Input->isKeyDown('P'))
+  {
+    tessellationLevel += 5.0f * m_Timer->GetTime();
 
+    if (tessellationLevel > 64.0f)
+    {
+      tessellationLevel = 64.0f;
+    }
+  }
+
+  if (m_Input->isKeyDown('O'))
+  {
+    tessellationLevel -= 5.0f * m_Timer->GetTime();
+
+    if (tessellationLevel < 1.0f)
+    {
+      tessellationLevel = 1.0f;
+    }
+  }
 
 
 
@@ -488,7 +509,7 @@ void Procedural::drawGeometry()
   else
   {
     m_UberTessellShader->setCamera(m_Camera);
-    m_UberTessellShader->setFixedTessellation(8.0f);
+    m_UberTessellShader->setFixedTessellation(tessellationLevel);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());

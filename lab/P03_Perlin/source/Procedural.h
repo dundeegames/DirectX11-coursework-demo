@@ -118,6 +118,8 @@ private:
   OrthoMesh* m_OrthoMesh;
   const XMFLOAT3 m_colourOverlay;
 
+  float tessellationLevel;
+
 };
 
 
