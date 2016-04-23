@@ -44,6 +44,7 @@
 #include <Shaders/UberShader.h>
 #include <Shaders/UberTessellShader.h>
 #include <Shaders/TextureShader.h>
+#include <Shaders/Simplex2DheightShader.h>
 
 #include <Geometry/Deprecated/PointMesh.h>
 #include <Geometry/Deprecated/CubeMesh.h>
@@ -78,16 +79,17 @@ private:
   void renderOrthoMesh();
   void drawGeometry();
 
+  void updateHeightmap();
+  void calculateNormals();
+
 private:
   GeometryShader* m_GeometryShader;
   PointMesh* m_PointMesh;
 
-  //UberShader* m_UberShader;
   UberTessellShader* m_UberShader;
   UberTessellShader* m_UberTessellShader;
 
-  OrthoMesh* m_OrthoHeightMeshBig;
-  OrthoMesh* m_OrthoHeightMeshSmall;
+  Simplex2DheightShader* m_simplexShader;
 
   SphereMesh* m_Mesh;
   TerrainMesh* m_Terrain;
@@ -106,6 +108,12 @@ private:
 
   TextureShader* m_TextureShader;
   RenderTexture* m_RenderTexture;
+
+  RenderTexture* m_Temptmap;
+  RenderTexture* m_Heightmap;
+  OrthoMesh* m_HeightmapMesh;
+  bool m_mapNotReady;
+
   OrthoMesh* m_OrthoMesh;
   const XMFLOAT3 m_colourOverlay;
 

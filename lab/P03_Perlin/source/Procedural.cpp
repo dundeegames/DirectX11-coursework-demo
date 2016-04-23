@@ -38,10 +38,11 @@
 Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_SpriteBatch(nullptr), m_SpriteFont(nullptr),
                            m_TextPosition(0.0f, 20.0f), m_Mesh(nullptr),
-                           m_UberShader(nullptr),
+                           m_UberShader(nullptr), m_simplexShader(nullptr),
                            m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
-                           m_OrthoHeightMeshBig(nullptr), m_OrthoHeightMeshSmall(nullptr),
                            m_Terrain(nullptr), m_UberTessellShader(nullptr),
+                           m_Heightmap(nullptr), m_HeightmapMesh(nullptr),
+                           m_mapNotReady(true), m_Temptmap(nullptr),
                            m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
@@ -62,6 +63,7 @@ Procedural::~Procedural()
   DELETE_OBJECT(m_PointMesh);
   DELETE_OBJECT(m_GeometryShader);
   DELETE_OBJECT(m_UberTessellShader);
+  DELETE_OBJECT(m_simplexShader);
   DELETE_OBJECT(m_Mesh);
   DELETE_OBJECT(m_PlaneMesh);
   DELETE_OBJECT(m_Terrain);
@@ -69,6 +71,10 @@ Procedural::~Procedural()
   DELETE_OBJECT(m_RendStateHelp);
 
   DELETE_OBJECT(m_RenderTexture);
+  DELETE_OBJECT(m_Heightmap);
+  DELETE_OBJECT(m_Temptmap);
+  DELETE_OBJECT(m_HeightmapMesh);
+
   DELETE_OBJECT(m_TextureShader);
   DELETE_OBJECT(m_OrthoMesh);
 
@@ -114,13 +120,13 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
 
   MeshGenerator meshGen = MeshGenerator(m_Direct3D->GetDevice());
-  m_PlaneMesh = meshGen.getPlane(500.0f, 500.0f, 8, 8);
+  m_PlaneMesh = meshGen.getPlane(100.0f, 100.0f, 8, 8);
   //m_PlaneMesh->setTexture(m_ResourceManager.getTexture(m_Direct3D->GetDevice(), L"brick1.dds"));
   //m_PlaneMesh->setPosition(0.0f, -2.0f, 0.0f);
 
 
   m_Terrain = new TerrainMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg",
-                              50.0f, 50.0f, 512, 512);
+                              10.0f, 10.0f, 32, 32);
 
   
   //m_UberShader = new UberShader(m_Direct3D->GetDevice(), hwnd);
@@ -132,20 +138,20 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
   m_UberTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
                                   L"shaders/ubertessellsimplex_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
 
+  // Heightmap RenderTexture, OrthoMesh and shader set for noise dissplacement calculation
+  m_Temptmap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
+  m_Heightmap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
+  
+  m_HeightmapMesh = new OrthoMesh(m_Direct3D->GetDevice(), 2048, 2048);
+
+  m_simplexShader = new Simplex2DheightShader(m_Direct3D->GetDevice(), hwnd);
+  m_simplexShader->InitShader(L"shaders/texture_vs.hlsl", L"shaders/simplex2d_height_ps.hlsl");
 
   
+
   initLights();
 
-
-  // ortho size and position set based on window size
-  // 200x200 pixels (standard would be matching window size for fullscreen mesh
-  // Position default at 0x0 centre window, to offset change values (pixel)
-  m_OrthoHeightMeshSmall = new OrthoMesh(m_Direct3D->GetDevice(), 128, 128);
-  m_OrthoHeightMeshBig = new OrthoMesh(m_Direct3D->GetDevice(), 1024, 1024);
-
-
-
-
+  
 
   // RenderTexture, OrthoMesh and shader set for different renderTarget
   m_RenderTexture = new RenderTexture(m_Direct3D->GetDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
@@ -222,6 +228,14 @@ bool Procedural::Frame()
 
 bool Procedural::Render()
 {
+  if (m_mapNotReady)
+  {
+    updateHeightmap();
+    calculateNormals();
+
+    m_mapNotReady = false;
+  }
+  
   if (m_EffectStage == NORMAL_STAGE)
   {
     // Reset the render target back to the original back buffer and not the render to texture anymore.
@@ -339,8 +353,9 @@ void Procedural::renderToTexture()
 
 void Procedural::renderOrthoMesh()
 {
-  XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
-  int renderState;
+  XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
+  // 
+  int renderState = STANDARD;
 
   switch (m_EffectStage)
   {
@@ -375,8 +390,6 @@ void Procedural::renderOrthoMesh()
 
   // Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
   m_Direct3D->GetWorldMatrix(worldMatrix);
-  m_Camera->GetViewMatrix(viewMatrix);
-  m_Direct3D->GetProjectionMatrix(projectionMatrix);
 
   // To render ortho mesh
   // Turn off the Z buffer to begin all 2D rendering.
@@ -484,7 +497,7 @@ void Procedural::drawGeometry()
   else
   {
     m_UberTessellShader->setCamera(m_Camera);
-    m_UberTessellShader->setFixedTessellation(1.0f);
+    m_UberTessellShader->setFixedTessellation(4.0f);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
@@ -492,10 +505,10 @@ void Procedural::drawGeometry()
     m_UberTessellShader->setTexture(nullptr);
     m_UberTessellShader->setHeightmap(nullptr);
 
-    worldMatrix = XMMatrixScaling(100.0f, 20.0f, 100.0f);
+    worldMatrix = XMMatrixScaling(10.0f, 2.0f, 10.0f);
     // Set shader parameters
     m_UberTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
-      projectionMatrix, XMMatrixIdentity());
+                                 projectionMatrix, XMMatrixIdentity());
     // Render object (combination of mesh geometry and shader process
     m_UberTessellShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
   }
@@ -504,7 +517,36 @@ void Procedural::drawGeometry()
 
 // -----------------------------------------------------------------------------
 
+void Procedural::updateHeightmap()
+{
+  XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
 
+  //// Set the render target to be the render to texture.
+  //m_Temptmap->SetRenderTarget(m_Direct3D->GetDeviceContext());
+
+  //// Clear the render to texture.
+  //m_Temptmap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
+
+  //drawGeometry();
+  
+}
+
+// -----------------------------------------------------------------------------
+
+void Procedural::calculateNormals()
+{
+  XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
+
+  //// Set the render target to be the render to texture.
+  //m_Heightmap->SetRenderTarget(m_Direct3D->GetDeviceContext());
+
+  //// Clear the render to texture.
+  //m_Heightmap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
+
+  //drawGeometry();
+}
+
+// -----------------------------------------------------------------------------
 
 
 

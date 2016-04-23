@@ -555,21 +555,21 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
 
 
   // Calculate vertexNormal
-  for (i = 0; i < 3; i++)
-  {
-    tempNormal = cross(noiseTan[i], noiseTan[i+1]);
-    vertexNormal += tempNormal;
-  }
-  tempNormal = cross(noiseTan[3], noiseTan[0]);
-  vertexNormal += tempNormal;
+  //for (i = 0; i < 3; i++)
+  //{
+  //  tempNormal = cross(noiseTan[i], noiseTan[i+1]);
+  //  vertexNormal += tempNormal;
+  //}
+  //tempNormal = cross(noiseTan[3], noiseTan[0]);
+  //vertexNormal += tempNormal;
 
-  vertexNormal = normalize(vertexNormal);
+  //vertexNormal = normalize(vertexNormal);
 
 
-  //nor1 = lerp(patch[0].normal, patch[1].normal, 1 - uvwCoord.y);
-  //nor2 = lerp(patch[2].normal, patch[3].normal, 1 - uvwCoord.y);
-  //vertexNormal = lerp(nor1, nor2, uvwCoord.x);
-  //vertexNormal.y += displacement;
+  nor1 = lerp(patch[0].normal, patch[1].normal, 1 - uvwCoord.y);
+  nor2 = lerp(patch[2].normal, patch[3].normal, 1 - uvwCoord.y);
+  vertexNormal = lerp(nor1, nor2, uvwCoord.x);
+  vertexNormal.y += displacement;
 
   
 

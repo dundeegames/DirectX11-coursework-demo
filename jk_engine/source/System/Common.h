@@ -41,6 +41,7 @@
 #define RADIANS(x) (x*PI/180)
 
 #define COLOUR_DEFAULT 0.392f, 0.584f, 0.929f, 1.0f
+#define COLOUR_ZERO    0.0f, 0.0f, 0.0f, 0.0f
 
 // CLASS ///////////////////////////////////////////////////////////////////////
 

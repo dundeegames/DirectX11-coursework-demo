@@ -157,6 +157,9 @@
     <ClCompile Include="..\source\Shaders\UberTessellShader.cpp">
       <Filter>Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\Shaders\Simplex2DheightShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Geometry\Texture.h">
@@ -289,6 +292,9 @@
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\source\Shaders\UberTessellShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Shaders\Simplex2DheightShader.h">
       <Filter>Shaders</Filter>
     </ClInclude>
   </ItemGroup>

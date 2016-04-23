@@ -34,10 +34,11 @@ using namespace DirectX;
 
 
 // DEFINES /////////////////////////////////////////////////////////////////////
-#define NORMAL        0
+#define STANDARD      0
 #define GRAYSCALE     1
 #define INVERSE       2
 #define COLOURED      3
+#define NORMALMAP     4
 #define STATE_ERROR   -1
 
 
@@ -60,7 +61,7 @@ public:
   void SetShaderParameters(ID3D11DeviceContext* deviceContext,
                             const XMMATRIX &world, const XMMATRIX &view,
                             const XMMATRIX &projection, ID3D11ShaderResourceView* texture,
-                            int state = NORMAL, XMFLOAT3 colour = XMFLOAT3(1.0f, 1.0f, 1.0f));
+                            int state = STANDARD, XMFLOAT3 colour = XMFLOAT3(1.0f, 1.0f, 1.0f));
 
   void Render(ID3D11DeviceContext* deviceContext, int vertexCount);
 
