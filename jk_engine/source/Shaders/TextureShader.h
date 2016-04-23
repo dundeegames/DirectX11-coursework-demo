@@ -38,7 +38,6 @@ using namespace DirectX;
 #define GRAYSCALE     1
 #define INVERSE       2
 #define COLOURED      3
-#define NORMALMAP     4
 #define STATE_ERROR   -1
 
 

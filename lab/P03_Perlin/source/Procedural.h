@@ -109,9 +109,10 @@ private:
   TextureShader* m_TextureShader;
   RenderTexture* m_RenderTexture;
 
-  RenderTexture* m_Temptmap;
+  RenderTexture* m_TempMap;
   RenderTexture* m_Heightmap;
   OrthoMesh* m_HeightmapMesh;
+  TextureShader* m_NormalShader;
   bool m_mapNotReady;
 
   OrthoMesh* m_OrthoMesh;

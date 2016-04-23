@@ -42,7 +42,7 @@ Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
                            m_Terrain(nullptr), m_UberTessellShader(nullptr),
                            m_Heightmap(nullptr), m_HeightmapMesh(nullptr),
-                           m_mapNotReady(true), m_Temptmap(nullptr),
+                           m_mapNotReady(true), m_TempMap(nullptr), m_NormalShader(nullptr),
                            m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
@@ -72,9 +72,10 @@ Procedural::~Procedural()
 
   DELETE_OBJECT(m_RenderTexture);
   DELETE_OBJECT(m_Heightmap);
-  DELETE_OBJECT(m_Temptmap);
+  DELETE_OBJECT(m_TempMap);
   DELETE_OBJECT(m_HeightmapMesh);
-
+  DELETE_OBJECT(m_NormalShader);
+  
   DELETE_OBJECT(m_TextureShader);
   DELETE_OBJECT(m_OrthoMesh);
 
@@ -126,7 +127,7 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
 
   m_Terrain = new TerrainMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg",
-                              10.0f, 10.0f, 32, 32);
+                              1.0f, 1.0f, 32, 32);
 
   
   //m_UberShader = new UberShader(m_Direct3D->GetDevice(), hwnd);
@@ -136,10 +137,10 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
   m_UberTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
   m_UberTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
-                                  L"shaders/ubertessellsimplex_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
+                                  L"shaders/ubertessellfbm_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
 
   // Heightmap RenderTexture, OrthoMesh and shader set for noise dissplacement calculation
-  m_Temptmap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
+  m_TempMap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
   m_Heightmap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
   
   m_HeightmapMesh = new OrthoMesh(m_Direct3D->GetDevice(), 2048, 2048);
@@ -147,7 +148,8 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
   m_simplexShader = new Simplex2DheightShader(m_Direct3D->GetDevice(), hwnd);
   m_simplexShader->InitShader(L"shaders/texture_vs.hlsl", L"shaders/simplex2d_height_ps.hlsl");
 
-  
+  m_NormalShader = new TextureShader(m_Direct3D->GetDevice(), hwnd);
+  m_NormalShader->InitShader(L"shaders/texture_vs.hlsl", L"shaders/normal_ps.hlsl");
 
   initLights();
 
@@ -228,7 +230,7 @@ bool Procedural::Frame()
 
 bool Procedural::Render()
 {
-  if (m_mapNotReady)
+  if (m_mapNotReady && m_EffectStage == GRAYSCALE_STAGE)
   {
     updateHeightmap();
     calculateNormals();
@@ -255,8 +257,7 @@ bool Procedural::Render()
     renderToTexture();
     renderOrthoMesh();
   }
-
-
+  
   return true;
 }
 
@@ -497,7 +498,7 @@ void Procedural::drawGeometry()
   else
   {
     m_UberTessellShader->setCamera(m_Camera);
-    m_UberTessellShader->setFixedTessellation(4.0f);
+    m_UberTessellShader->setFixedTessellation(8.0f);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
@@ -505,7 +506,8 @@ void Procedural::drawGeometry()
     m_UberTessellShader->setTexture(nullptr);
     m_UberTessellShader->setHeightmap(nullptr);
 
-    worldMatrix = XMMatrixScaling(10.0f, 2.0f, 10.0f);
+    worldMatrix = XMMatrixScaling(100.0f, 4.0f, 100.0f);
+
     // Set shader parameters
     m_UberTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
                                  projectionMatrix, XMMatrixIdentity());
@@ -521,14 +523,34 @@ void Procedural::updateHeightmap()
 {
   XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
 
-  //// Set the render target to be the render to texture.
-  //m_Temptmap->SetRenderTarget(m_Direct3D->GetDeviceContext());
+  // Generate the view matrix based on the camera's position.
+  m_Camera->Update();
 
-  //// Clear the render to texture.
-  //m_Temptmap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
+  // Set the render target to be the render to texture.
+  m_TempMap->SetRenderTarget(m_Direct3D->GetDeviceContext());
 
-  //drawGeometry();
+  // Clear the render to texture.
+  m_TempMap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
+
+  // Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
+  m_Direct3D->GetWorldMatrix(worldMatrix);
+
+  // To render ortho mesh
+  // Turn off the Z buffer to begin all 2D rendering.
+  m_Direct3D->TurnZBufferOff();
+
+  m_Direct3D->GetOrthoMatrix(orthoMatrix);// ortho matrix for 2D rendering
+  m_Camera->GetBaseViewMatrix(baseViewMatrix);
+
+  m_HeightmapMesh->SendData(m_Direct3D->GetDeviceContext());
+
+  m_simplexShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, baseViewMatrix,
+                                       orthoMatrix);
+
+  m_simplexShader->Render(m_Direct3D->GetDeviceContext(), m_HeightmapMesh->GetIndexCount());
   
+  m_Direct3D->TurnZBufferOn();
+
 }
 
 // -----------------------------------------------------------------------------
@@ -537,13 +559,37 @@ void Procedural::calculateNormals()
 {
   XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
 
-  //// Set the render target to be the render to texture.
-  //m_Heightmap->SetRenderTarget(m_Direct3D->GetDeviceContext());
+  // Generate the view matrix based on the camera's position.
+  m_Camera->Update();
 
-  //// Clear the render to texture.
-  //m_Heightmap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
+  // Set the render target to be the render to texture.
+  m_Heightmap->SetRenderTarget(m_Direct3D->GetDeviceContext());
 
-  //drawGeometry();
+  // Clear the render to texture.
+  m_Heightmap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
+
+  // Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
+  m_Direct3D->GetWorldMatrix(worldMatrix);
+
+  // To render ortho mesh
+  // Turn off the Z buffer to begin all 2D rendering.
+  m_Direct3D->TurnZBufferOff();
+
+  m_Direct3D->GetOrthoMatrix(orthoMatrix);// ortho matrix for 2D rendering
+  m_Camera->GetBaseViewMatrix(baseViewMatrix);
+
+  m_HeightmapMesh->SendData(m_Direct3D->GetDeviceContext());
+
+  m_NormalShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, baseViewMatrix,
+                                      orthoMatrix, m_TempMap->GetShaderResourceView(),
+                                      STANDARD, XMFLOAT3(0.0f, 0.0f, 0.0f));
+
+  m_NormalShader->Render(m_Direct3D->GetDeviceContext(), m_HeightmapMesh->GetIndexCount());
+
+  m_Direct3D->TurnZBufferOn();
+
+
+
 }
 
 // -----------------------------------------------------------------------------
