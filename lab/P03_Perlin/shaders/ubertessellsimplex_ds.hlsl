@@ -571,9 +571,7 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
   //vertexNormal = lerp(nor1, nor2, uvwCoord.x);
   //vertexNormal.y += displacement;
 
-
-
-
+  
 
   // Calculate the position of the vertex in the world.
   worldPosition = mul(float4(vertexPosition, 1.0f), worldMatrix);
@@ -599,7 +597,7 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
   output.tex = texturePosition;
 
   // Calculate the normal vector against the world matrix only.
-  output.normal = mul(vertexNormal, (float3x3)worldMatrix);
+  output.normal = output.normal = (float3)(mul(float4(vertexNormal, 1.0f), worldMatrix));
 
   // Normalize the normal vector.
   output.normal = normalize(output.normal);

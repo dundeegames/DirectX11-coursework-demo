@@ -90,8 +90,7 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
   nor1 = lerp(patch[0].normal, patch[1].normal, 1 - uvwCoord.y);
   nor2 = lerp(patch[2].normal, patch[3].normal, 1 - uvwCoord.y);
   vertexNormal = lerp(nor1, nor2, uvwCoord.x);
-
-
+  
 
   tex1 = lerp(patch[0].tex, patch[1].tex, 1 - uvwCoord.y);
   tex2 = lerp(patch[2].tex, patch[3].tex, 1 - uvwCoord.y);
@@ -124,7 +123,7 @@ OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, c
   output.tex = texturePosition;
 
   // Calculate the normal vector against the world matrix only.
-  output.normal = mul(vertexNormal, (float3x3)worldMatrix);
+  output.normal = (float3)( mul(float4(vertexNormal, 1.0f), worldMatrix) );
 
   // Normalize the normal vector.
   output.normal = normalize(output.normal);

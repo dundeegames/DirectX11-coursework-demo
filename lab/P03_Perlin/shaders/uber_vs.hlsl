@@ -80,7 +80,8 @@ OutputType main(InputType input)
   output.tex = input.tex;
 
   // Calculate the normal vector against the world matrix only.
-  output.normal = mul(input.normal, (float3x3)worldMatrix);
+  output.normal = (float3)(mul(float4(input.normal, 1.0f), worldMatrix));
+  
 	
   // Normalize the normal vector.
   output.normal = normalize(output.normal);
