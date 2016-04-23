@@ -489,7 +489,7 @@ float snoise4(float x, float y, float z, float w)
 */
 float ridgetMultifractal(float3 inputPoint, float H, float lacunarity, float offset, float gain)
 {
-  const int OCTAVES = 4;
+  const int OCTAVES = 8;
 
   float3 position = inputPoint;
   float frequency = 1.0f;
@@ -509,7 +509,11 @@ float ridgetMultifractal(float3 inputPoint, float H, float lacunarity, float off
 
   for (int i = 0; i < OCTAVES; i++)
   {
-    result += snoise3(position.x, position.y, position.z) * pow(lacunarity, -H * i);
+    signal = (snoise3(position.x, position.y, position.z) * pow(lacunarity, -H * i));
+
+    signal = abs(signal);
+
+    result += signal;
 
     position.x *= lacunarity;
     position.y *= lacunarity;
@@ -518,21 +522,21 @@ float ridgetMultifractal(float3 inputPoint, float H, float lacunarity, float off
   }
 
 
-  // get first octave
-  signal = snoise3(position.x, position.y, position.z);
+  //// get first octave
+  //signal = snoise3(position.x, position.y, position.z);
 
-  // get abs value of signal (this creates the ridges)
-  signal = abs(signal);
+  //// get abs value of signal (this creates the ridges)
+  //signal = abs(signal);
 
-  //// invert and translate (offset should be ~= 1.0)
-  //signal = offset - signal;
+  ////// invert and translate (offset should be ~= 1.0)
+  ////signal = offset - signal;
 
-  // square the signal to sharpen the ridges
-  signal *= signal;
+  //// square the signal to sharpen the ridges
+  //signal *= signal;
 
-  // assign initial values
-  result = signal;
-  weight = 1.0f;
+  //// assign initial values
+  //result = signal;
+  //weight = 1.0f;
 
 
 
