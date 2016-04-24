@@ -368,26 +368,26 @@ float snoise3(float x, float y, float z)
 
 // -----------------------------------------------------------------------------
 
-float stripes(float x, float f)
+float marble2d(float2 inputPoint, int f)
 {
-  float t = ( 0.5f + 0.5 * sin(f * 2*PI * x) );
+  //float t = 2.0f * (inputPoint.x + inputPoint.y) - 1.5f;
+  float t = 2.5f * inputPoint.x;
+  float signal = 0.0f;
 
-  return (t * t - 0.5f);
+  for (int i = 1; i <= f; i++)
+  {
+    signal = snoise2(inputPoint.x * (float)i, inputPoint.y * (float)i);
+    signal = (abs(signal) / i);
+
+    t += signal;
+  }
+
+  return sin(t);
 }
 
 // -----------------------------------------------------------------------------
 
-float turbulence(float x, float y, float z, float f)
-{
-  float t = x;
-
- 
-  return t;
-}
-
-// -----------------------------------------------------------------------------
-
-float marble(float3 inputPoint, int f)
+float marble3d(float3 inputPoint, int f)
 {
   //float t = 2.0f * (inputPoint.x + inputPoint.y) - 1.5f;
   float t = 2.5f * inputPoint.x;
@@ -450,7 +450,7 @@ float4 main(InputType input) : SV_TARGET
   float4 specularFX = (float4)0;
   float4 finalSpec = (float4)0;
 
-  float3 pixelPosition = input.position3D;
+  //float3 pixelPosition = input.position3D;
   float colourChannel = 0.0f;
 
 
@@ -469,10 +469,13 @@ float4 main(InputType input) : SV_TARGET
   // Sample the pixel color from the texture using the sampler at this texture coordinate location.
   //textureColour = shaderTexture.Sample(SampleType, input.tex);
 
+  // Perlin Simplex Noise
   //colourChannel = snoise3(pixelPosition.x, pixelPosition.y, pixelPosition.z);
   //colourChannel *= 7.0f;
 
-  colourChannel = marble(pixelPosition, 8);
+  // Marble pattern using Simplex noise
+  colourChannel = marble3d(input.position3D, 8);
+  //colourChannel = marble2d(input.tex, 8);
   colourChannel = ((colourChannel * 0.5f) + 0.5f);  // rescale fro [-1, 1] to [0, 1]
   colourChannel = clamp(colourChannel, 0, 1);
   textureColour = float4(colourChannel, colourChannel, colourChannel, 1.0f);

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jk_engine", "..\jk_engine\project\jk_engine.vcxproj", "{8838F22F-F851-4B28-8E6D-50AB304A773D}"
 EndProject
@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXUT", "..\jk_engine\extern
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXUTOpt", "..\jk_engine\external\DXUT\Optional\DXUTOpt_DirectXTK_2013.vcxproj", "{61B333C2-C4F7-4CC1-A9BF-83F6D95588EB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "P03_Perlin", "..\lab\P03_Perlin\P03_Perlin.vcxproj", "{0E47405E-668D-4B5F-B7DC-DFA6F9D255F9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcGenFBM", "..\lab\ProcGenFBM\ProcGenFBM.vcxproj", "{0E47405E-668D-4B5F-B7DC-DFA6F9D255F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
