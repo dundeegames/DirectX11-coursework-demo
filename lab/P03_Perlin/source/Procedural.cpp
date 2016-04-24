@@ -289,7 +289,7 @@ void Procedural::initLights()
   m_Lights[0] = new Light;
   m_Lights[0]->SetDiffuseColour(0.25f, 0.25f, 0.25f, 1.0f);  // white
   m_Lights[0]->SetAmbientColour(0.5f, 0.5f, 0.5f, 1.0f); // gray
-  m_Lights[0]->SetPosition(0.0f, 9.0f, 0.0f);
+  m_Lights[0]->SetPosition(5.0f, 9.0f, 0.0f);
   //m_Lights[0]->SetSpecularColour(0.0f, 0.0f, 0.0f, 1.0f);  // no specular
   m_Lights[0]->SetSpecularColour(0.5f, 0.5f, 0.5f, 1.0f);  // white
   m_Lights[0]->SetSpecularPower(25.0);
@@ -298,7 +298,7 @@ void Procedural::initLights()
   m_Lights[1] = new Light;
   m_Lights[1]->SetDiffuseColour(0.5f, 0.25f, 0.25f, 1.0f);  // light red
   m_Lights[1]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[1]->SetPosition(20.0f, 9.0f, 15.0f);
+  m_Lights[1]->SetPosition(25.0f, 5.0f, 25.0f);
   //m_Lights[1]->SetSpecularColour(0.75f, 0.0f, 0.0f, 1.0f);  // red
   m_Lights[1]->SetSpecularColour(0.0f, 0.0f, 0.0f, 1.0f);  // no specular
   m_Lights[1]->SetSpecularPower(25.0);
@@ -307,7 +307,7 @@ void Procedural::initLights()
   m_Lights[2] = new Light;
   m_Lights[2]->SetDiffuseColour(0.25f, 0.25f, 0.5f, 1.0f);  // light blue
   m_Lights[2]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[2]->SetPosition(15.0f, 9.0f, 15.0f);
+  m_Lights[2]->SetPosition(25.0f, 7.5f, -25.0f);
   m_Lights[2]->SetSpecularColour(0.0f, 0.0f, 0.75f, 1.0f);  // blue
   m_Lights[2]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[2]);
@@ -315,7 +315,7 @@ void Procedural::initLights()
   m_Lights[3] = new Light;
   m_Lights[3]->SetDiffuseColour(0.0f, 0.2f, 0.0f, 1.0f);  // green
   m_Lights[3]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[3]->SetPosition(-15.0f, 9.0f, -15.0f);
+  m_Lights[3]->SetPosition(-25.0f, 8.0f, -25.0f);
   m_Lights[3]->SetSpecularColour(0.0f, 0.5f, 0.0f, 1.0f);  // green
   m_Lights[3]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[3]);
@@ -323,7 +323,7 @@ void Procedural::initLights()
   m_Lights[4] = new Light;
   m_Lights[4]->SetDiffuseColour(0.2f, 0.2f, 0.0f, 1.0f);  // light yellow
   m_Lights[4]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[4]->SetPosition(15.0f, 9.0f, -15.0f);
+  m_Lights[4]->SetPosition(-35.0f, 9.0f, 35.0f);
   m_Lights[4]->SetSpecularColour(0.5f, 0.5f, 0.0f, 1.0f);  // yellow
   m_Lights[4]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[4]);
@@ -331,7 +331,7 @@ void Procedural::initLights()
   m_Lights[5] = new Light;
   m_Lights[5]->SetDiffuseColour(0.2f, 0.1f, 0.0f, 1.0f);  // orange
   m_Lights[5]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[5]->SetPosition(0.0f, 9.0f, -15.0f);
+  m_Lights[5]->SetPosition(0.0f, 7.5f, -25.0f);
   m_Lights[5]->SetSpecularColour(0.5f, 0.25f, 0.0f, 1.0f);  // orange
   m_Lights[5]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[5]);
@@ -339,7 +339,7 @@ void Procedural::initLights()
   m_Lights[6] = new Light;
   m_Lights[6]->SetDiffuseColour(0.2f, 0.0f, 0.2f, 1.0f);  // violet
   m_Lights[6]->SetAmbientColour(0.0f, 0.0f, 0.0f, 1.0f); // no ambient
-  m_Lights[6]->SetPosition(0.0f, 9.0f, 15.0f);
+  m_Lights[6]->SetPosition(0.0f, 8.0f, 25.0f);
   m_Lights[6]->SetSpecularColour(0.5f, 0.0f, 0.5f, 1.0f);  // violet
   m_Lights[6]->SetSpecularPower(25.0);
   m_UberShader->addLight(m_Lights[6]);
