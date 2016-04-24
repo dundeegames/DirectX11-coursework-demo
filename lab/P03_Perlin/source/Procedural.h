@@ -56,7 +56,7 @@
 
 // CLASS ///////////////////////////////////////////////////////////////////////
 
-enum RenderStage { DISPLACEMENT_OFF_STAGE, DISPLACEMENT_ON_STAGE };
+enum RenderStage { FBM_STAGE, SIMPLEX_STAGE };
 enum EffectStage { NORMAL_STAGE, GRAYSCALE_STAGE, INVERSE_STAGE, COLOURED_STAGE };
 
 

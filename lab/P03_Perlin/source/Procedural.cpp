@@ -43,7 +43,7 @@ Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_Terrain(nullptr), m_UberTessellShader(nullptr),
                            m_Heightmap(nullptr), m_HeightmapMesh(nullptr),
                            m_mapNotReady(true), m_TempMap(nullptr), m_NormalShader(nullptr),
-                           m_RenderStage(DISPLACEMENT_OFF_STAGE), m_EffectStage(NORMAL_STAGE),
+                           m_RenderStage(FBM_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
   for (int i = 0; i < MAX_LIGHTS; i++)
@@ -137,7 +137,7 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
   m_UberTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
   m_UberTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
-                                  L"shaders/ubertessellfbm_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
+                                  L"shaders/ubertessellfbm_ds.hlsl", L"shaders/ubertessellfbm_ps.hlsl");
 
   // Heightmap RenderTexture, OrthoMesh and shader set for noise dissplacement calculation
   m_TempMap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
@@ -207,12 +207,12 @@ bool Procedural::Frame()
 
   if (m_Input->isKeyDown(VK_F5))
   {
-    m_RenderStage = DISPLACEMENT_OFF_STAGE;
+    m_RenderStage = FBM_STAGE;
   }
 
   if (m_Input->isKeyDown(VK_F6))
   {
-    m_RenderStage = DISPLACEMENT_ON_STAGE;
+    m_RenderStage = SIMPLEX_STAGE;
   }
 
   if (m_Input->isKeyDown('P'))
@@ -491,23 +491,9 @@ void Procedural::drawGeometry()
   m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_Mesh->GetIndexCount());
 
 
-  if (m_RenderStage == DISPLACEMENT_OFF_STAGE)
+  switch (m_RenderStage)
   {
-    // Send geometry data (from mesh)
-    m_PlaneMesh->SendData(m_Direct3D->GetDeviceContext());
-    m_UberShader->setTexture(m_PlaneMesh->GetTexture());
-    // Get Mesh position
-    worldMatrix = m_PlaneMesh->getWorldMatrix();
-    // Set shader parameters
-    m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
-                          projectionMatrix, XMMatrixIdentity());
-
-    // Render object (combination of mesh geometry and shader process
-    m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_PlaneMesh->GetIndexCount());
-
-  }
-  else
-  {
+  case FBM_STAGE:
     m_UberTessellShader->setCamera(m_Camera);
     m_UberTessellShader->setFixedTessellation(tessellationLevel);
 
@@ -521,9 +507,29 @@ void Procedural::drawGeometry()
 
     // Set shader parameters
     m_UberTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
-                                 projectionMatrix, XMMatrixIdentity());
+      projectionMatrix, XMMatrixIdentity());
     // Render object (combination of mesh geometry and shader process
     m_UberTessellShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
+    break;
+
+
+  case SIMPLEX_STAGE:
+    // Send geometry data (from mesh)
+    m_PlaneMesh->SendData(m_Direct3D->GetDeviceContext());
+    m_UberShader->setTexture(m_PlaneMesh->GetTexture());
+    // Get Mesh position
+    worldMatrix = m_PlaneMesh->getWorldMatrix();
+    // Set shader parameters
+    m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
+      projectionMatrix, XMMatrixIdentity());
+
+    // Render object (combination of mesh geometry and shader process
+    m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_PlaneMesh->GetIndexCount());
+    break;
+
+  default:
+    break;
+
   }
 
 }

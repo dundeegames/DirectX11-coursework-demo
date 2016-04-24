@@ -79,5 +79,8 @@
     <FxCompile Include="shaders\ubertessellfbm_ds.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\ubertessellfbm_ps.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
