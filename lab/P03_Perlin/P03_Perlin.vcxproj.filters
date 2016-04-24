@@ -70,12 +70,6 @@
     <FxCompile Include="shaders\ubertessellsimplex_ds.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\simplex2d_height_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\normal_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\ubertessellfbm_ds.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>

@@ -104,7 +104,6 @@
     <ClCompile Include="..\source\Shaders\MultiLightShader.cpp" />
     <ClCompile Include="..\source\Shaders\PointLightShader.cpp" />
     <ClCompile Include="..\source\Shaders\ShadowShader.cpp" />
-    <ClCompile Include="..\source\Shaders\Simplex2DheightShader.cpp" />
     <ClCompile Include="..\source\Shaders\SpecularShader.cpp" />
     <ClCompile Include="..\source\Shaders\TessellationShader.cpp" />
     <ClCompile Include="..\source\Shaders\TextureShader.cpp" />
@@ -151,7 +150,6 @@
     <ClInclude Include="..\source\Shaders\MultiLightShader.h" />
     <ClInclude Include="..\source\Shaders\PointLightShader.h" />
     <ClInclude Include="..\source\Shaders\ShadowShader.h" />
-    <ClInclude Include="..\source\Shaders\Simplex2DheightShader.h" />
     <ClInclude Include="..\source\Shaders\SpecularShader.h" />
     <ClInclude Include="..\source\Shaders\TessellationShader.h" />
     <ClInclude Include="..\source\Shaders\TextureShader.h" />

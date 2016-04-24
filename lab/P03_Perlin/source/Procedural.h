@@ -44,14 +44,11 @@
 #include <Shaders/UberShader.h>
 #include <Shaders/UberTessellShader.h>
 #include <Shaders/TextureShader.h>
-#include <Shaders/Simplex2DheightShader.h>
 
 #include <Geometry/Deprecated/PointMesh.h>
-#include <Geometry/Deprecated/CubeMesh.h>
 #include <Geometry/Deprecated/SphereMesh.h>
 #include <Geometry/Deprecated/OrthoMesh.h>
 
-#include <Geometry/Mesh.h>
 #include <Geometry/TerrainMesh.h>
 
 // CLASS ///////////////////////////////////////////////////////////////////////
@@ -79,21 +76,16 @@ private:
   void renderOrthoMesh();
   void drawGeometry();
 
-  void updateHeightmap();
-  void calculateNormals();
-
 private:
   GeometryShader* m_GeometryShader;
   PointMesh* m_PointMesh;
 
-  UberTessellShader* m_UberShader;
-  UberTessellShader* m_UberTessellShader;
+  UberTessellShader* m_SphereShader;
+  UberTessellShader* m_PlaneTessellShader;
+  UberTessellShader* m_fBmTessellShader;
 
-  Simplex2DheightShader* m_simplexShader;
-
-  SphereMesh* m_Mesh;
+  SphereMesh* m_SphereMesh;
   TerrainMesh* m_Terrain;
-  Mesh* m_PlaneMesh;
 
   Light* m_Lights[MAX_LIGHTS];
 
@@ -108,12 +100,6 @@ private:
 
   TextureShader* m_TextureShader;
   RenderTexture* m_RenderTexture;
-
-  RenderTexture* m_TempMap;
-  RenderTexture* m_Heightmap;
-  OrthoMesh* m_HeightmapMesh;
-  TextureShader* m_NormalShader;
-  bool m_mapNotReady;
 
   OrthoMesh* m_OrthoMesh;
   const XMFLOAT3 m_colourOverlay;

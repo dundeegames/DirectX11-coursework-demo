@@ -37,12 +37,10 @@
 
 Procedural::Procedural() : m_PointMesh(nullptr), m_GeometryShader(nullptr),
                            m_SpriteBatch(nullptr), m_SpriteFont(nullptr),
-                           m_TextPosition(0.0f, 20.0f), m_Mesh(nullptr),
-                           m_UberShader(nullptr), m_simplexShader(nullptr),
-                           m_RendStateHelp(nullptr), m_PlaneMesh(nullptr),
-                           m_Terrain(nullptr), m_UberTessellShader(nullptr),
-                           m_Heightmap(nullptr), m_HeightmapMesh(nullptr),
-                           m_mapNotReady(true), m_TempMap(nullptr), m_NormalShader(nullptr),
+                           m_TextPosition(0.0f, 20.0f), m_SphereMesh(nullptr),
+                           m_SphereShader(nullptr), m_PlaneTessellShader(nullptr),
+                           m_RendStateHelp(nullptr),
+                           m_Terrain(nullptr), m_fBmTessellShader(nullptr),
                            m_RenderStage(FBM_STAGE), m_EffectStage(NORMAL_STAGE),
                            m_colourOverlay(0.8f, 0.4f, 0.0f)
 {
@@ -62,20 +60,14 @@ Procedural::~Procedural()
   // Release the Direct3D object.
   DELETE_OBJECT(m_PointMesh);
   DELETE_OBJECT(m_GeometryShader);
-  DELETE_OBJECT(m_UberTessellShader);
-  DELETE_OBJECT(m_simplexShader);
-  DELETE_OBJECT(m_Mesh);
-  DELETE_OBJECT(m_PlaneMesh);
-  DELETE_OBJECT(m_Terrain);
-  DELETE_OBJECT(m_UberShader);
-  DELETE_OBJECT(m_RendStateHelp);
+  DELETE_OBJECT(m_fBmTessellShader);
+  DELETE_OBJECT(m_PlaneTessellShader);
+  DELETE_OBJECT(m_SphereShader);
 
-  DELETE_OBJECT(m_RenderTexture);
-  DELETE_OBJECT(m_Heightmap);
-  DELETE_OBJECT(m_TempMap);
-  DELETE_OBJECT(m_HeightmapMesh);
-  DELETE_OBJECT(m_NormalShader);
-  
+  DELETE_OBJECT(m_SphereMesh);
+  DELETE_OBJECT(m_Terrain);  
+  DELETE_OBJECT(m_RendStateHelp);
+  DELETE_OBJECT(m_RenderTexture);  
   DELETE_OBJECT(m_TextureShader);
   DELETE_OBJECT(m_OrthoMesh);
 
@@ -112,47 +104,33 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
 
 
-  m_Camera->SetPosition(20.0f, 20.0f, -40.0f);
-  m_Camera->SetRotation(35.0f, -25.0f, 0.0f);
+  m_Camera->SetPosition(40.0f, 30.0f, -50.0f);
+  m_Camera->SetRotation(32.0f, -39.0f, 0.0f);
 
 
   // Create Mesh object
-  m_Mesh = new SphereMesh(m_Direct3D->GetDevice(), L"../media/DefaultDiffuse.png");
-
-
-  MeshGenerator meshGen = MeshGenerator(m_Direct3D->GetDevice());
-  m_PlaneMesh = meshGen.getPlane(100.0f, 100.0f, 8, 8);
-  //m_PlaneMesh->setTexture(m_ResourceManager.getTexture(m_Direct3D->GetDevice(), L"brick1.dds"));
-  //m_PlaneMesh->setPosition(0.0f, -2.0f, 0.0f);
+  m_SphereMesh = new SphereMesh(m_Direct3D->GetDevice(), L"../media/DefaultDiffuse.png");
 
 
   m_Terrain = new TerrainMesh(m_Direct3D->GetDevice(), L"../media/waterDisplaceMap.jpg",
                               5.0f, 5.0f, 32, 32);
 
   
-  //m_UberShader = new UberShader(m_Direct3D->GetDevice(), hwnd);
-  m_UberShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
-  m_UberShader->InitShader(L"shaders/uber_vs.hlsl", L"shaders/uber_ps.hlsl");
+  m_SphereShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
+  m_SphereShader->InitShader(L"shaders/uber_vs.hlsl", L"shaders/uber_ps.hlsl");
 
 
-  m_UberTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
-  m_UberTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
+  m_fBmTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
+  m_fBmTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
                                   L"shaders/ubertessellfbm_ds.hlsl", L"shaders/ubertessellfbm_ps.hlsl");
 
-  // Heightmap RenderTexture, OrthoMesh and shader set for noise dissplacement calculation
-  m_TempMap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
-  m_Heightmap = new RenderTexture(m_Direct3D->GetDevice(), 2048, 2048, SCREEN_NEAR, SCREEN_DEPTH);
-  
-  m_HeightmapMesh = new OrthoMesh(m_Direct3D->GetDevice(), 2048, 2048);
 
-  m_simplexShader = new Simplex2DheightShader(m_Direct3D->GetDevice(), hwnd);
-  m_simplexShader->InitShader(L"shaders/texture_vs.hlsl", L"shaders/simplex2d_height_ps.hlsl");
+  m_PlaneTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
+  m_PlaneTessellShader->InitShader(L"shaders/ubertessell_vs.hlsl", L"shaders/ubertessell_hs.hlsl",
+                                   L"shaders/ubertessell_ds.hlsl", L"shaders/ubertessell_ps.hlsl");
 
-  m_NormalShader = new TextureShader(m_Direct3D->GetDevice(), hwnd);
-  m_NormalShader->InitShader(L"shaders/texture_vs.hlsl", L"shaders/normal_ps.hlsl");
 
   initLights();
-
   
 
   // RenderTexture, OrthoMesh and shader set for different renderTarget
@@ -251,14 +229,6 @@ bool Procedural::Frame()
 
 bool Procedural::Render()
 {
-  if (m_mapNotReady && m_EffectStage == GRAYSCALE_STAGE)
-  {
-    updateHeightmap();
-    calculateNormals();
-
-    m_mapNotReady = false;
-  }
-  
   if (m_EffectStage == NORMAL_STAGE)
   {
     // Reset the render target back to the original back buffer and not the render to texture anymore.
@@ -293,7 +263,7 @@ void Procedural::initLights()
   //m_Lights[0]->SetSpecularColour(0.0f, 0.0f, 0.0f, 1.0f);  // no specular
   m_Lights[0]->SetSpecularColour(0.5f, 0.5f, 0.5f, 1.0f);  // white
   m_Lights[0]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[0]);
+  m_SphereShader->addLight(m_Lights[0]);
 
   m_Lights[1] = new Light;
   m_Lights[1]->SetDiffuseColour(0.5f, 0.25f, 0.25f, 1.0f);  // light red
@@ -302,7 +272,7 @@ void Procedural::initLights()
   //m_Lights[1]->SetSpecularColour(0.75f, 0.0f, 0.0f, 1.0f);  // red
   m_Lights[1]->SetSpecularColour(0.0f, 0.0f, 0.0f, 1.0f);  // no specular
   m_Lights[1]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[1]);
+  m_SphereShader->addLight(m_Lights[1]);
 
   m_Lights[2] = new Light;
   m_Lights[2]->SetDiffuseColour(0.25f, 0.25f, 0.5f, 1.0f);  // light blue
@@ -310,7 +280,7 @@ void Procedural::initLights()
   m_Lights[2]->SetPosition(25.0f, 7.5f, -25.0f);
   m_Lights[2]->SetSpecularColour(0.0f, 0.0f, 0.75f, 1.0f);  // blue
   m_Lights[2]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[2]);
+  m_SphereShader->addLight(m_Lights[2]);
 
   m_Lights[3] = new Light;
   m_Lights[3]->SetDiffuseColour(0.0f, 0.2f, 0.0f, 1.0f);  // green
@@ -318,7 +288,7 @@ void Procedural::initLights()
   m_Lights[3]->SetPosition(-25.0f, 8.0f, -25.0f);
   m_Lights[3]->SetSpecularColour(0.0f, 0.5f, 0.0f, 1.0f);  // green
   m_Lights[3]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[3]);
+  m_SphereShader->addLight(m_Lights[3]);
 
   m_Lights[4] = new Light;
   m_Lights[4]->SetDiffuseColour(0.2f, 0.2f, 0.0f, 1.0f);  // light yellow
@@ -326,7 +296,7 @@ void Procedural::initLights()
   m_Lights[4]->SetPosition(-35.0f, 9.0f, 35.0f);
   m_Lights[4]->SetSpecularColour(0.5f, 0.5f, 0.0f, 1.0f);  // yellow
   m_Lights[4]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[4]);
+  m_SphereShader->addLight(m_Lights[4]);
 
   m_Lights[5] = new Light;
   m_Lights[5]->SetDiffuseColour(0.2f, 0.1f, 0.0f, 1.0f);  // orange
@@ -334,7 +304,7 @@ void Procedural::initLights()
   m_Lights[5]->SetPosition(0.0f, 7.5f, -25.0f);
   m_Lights[5]->SetSpecularColour(0.5f, 0.25f, 0.0f, 1.0f);  // orange
   m_Lights[5]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[5]);
+  m_SphereShader->addLight(m_Lights[5]);
 
   m_Lights[6] = new Light;
   m_Lights[6]->SetDiffuseColour(0.2f, 0.0f, 0.2f, 1.0f);  // violet
@@ -342,7 +312,7 @@ void Procedural::initLights()
   m_Lights[6]->SetPosition(0.0f, 8.0f, 25.0f);
   m_Lights[6]->SetSpecularColour(0.5f, 0.0f, 0.5f, 1.0f);  // violet
   m_Lights[6]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[6]);
+  m_SphereShader->addLight(m_Lights[6]);
 
   m_Lights[5] = new Light;
   m_Lights[5]->SetDiffuseColour(0.0f, 0.2f, 0.2f, 1.0f);  // magenta
@@ -350,7 +320,7 @@ void Procedural::initLights()
   m_Lights[5]->SetPosition(-5.0f, 9.0f, 0.0f);
   m_Lights[5]->SetSpecularColour(0.0f, 0.5f, 0.5f, 1.0f);  // magenta
   m_Lights[5]->SetSpecularPower(25.0);
-  m_UberShader->addLight(m_Lights[5]);
+  m_SphereShader->addLight(m_Lights[5]);
 
 
 }
@@ -475,56 +445,66 @@ void Procedural::drawGeometry()
   m_GeometryShader->Render(m_Direct3D->GetDeviceContext(), m_PointMesh->GetIndexCount());
 
 
-  m_UberShader->setCamera(m_Camera);
+  m_SphereShader->setCamera(m_Camera);
 
   // Send geometry data (from mesh)
-  m_Mesh->SendData(m_Direct3D->GetDeviceContext());
-  m_UberShader->setTexture(m_Mesh->GetTexture());
+  m_SphereMesh->SendData(m_Direct3D->GetDeviceContext());
+  m_SphereShader->setTexture(m_SphereMesh->GetTexture());
   // Get Mesh position
   //worldMatrix = XMMatrixTranslation(-1.5f, 0.0f, 0.0f);
   worldMatrix = XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 9.0f, 0.0f);
   // Set shader parameters
-  m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
+  m_SphereShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
     projectionMatrix, XMMatrixIdentity());
 
   // Render object (combination of mesh geometry and shader process
-  m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_Mesh->GetIndexCount());
+  m_SphereShader->Render(m_Direct3D->GetDeviceContext(), m_SphereMesh->GetIndexCount());
 
 
   switch (m_RenderStage)
   {
   case FBM_STAGE:
-    m_UberTessellShader->setCamera(m_Camera);
-    m_UberTessellShader->setFixedTessellation(tessellationLevel);
+
+    m_fBmTessellShader->setCamera(m_Camera);
+    m_fBmTessellShader->setFixedTessellation(tessellationLevel);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
 
-    m_UberTessellShader->setTexture(nullptr);
-    m_UberTessellShader->setHeightmap(nullptr);
+    m_fBmTessellShader->setTexture(nullptr);
+    m_fBmTessellShader->setHeightmap(nullptr);
 
     worldMatrix = XMMatrixScaling(20.0f, 4.0f, 20.0f);
 
     // Set shader parameters
-    m_UberTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
-      projectionMatrix, XMMatrixIdentity());
+    m_fBmTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
+                                 projectionMatrix, XMMatrixIdentity());
     // Render object (combination of mesh geometry and shader process
-    m_UberTessellShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
+    m_fBmTessellShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
+
     break;
 
 
   case SIMPLEX_STAGE:
+
+    m_PlaneTessellShader->setCamera(m_Camera);
+    m_PlaneTessellShader->setFixedTessellation(tessellationLevel);
+
     // Send geometry data (from mesh)
-    m_PlaneMesh->SendData(m_Direct3D->GetDeviceContext());
-    m_UberShader->setTexture(m_PlaneMesh->GetTexture());
-    // Get Mesh position
-    worldMatrix = m_PlaneMesh->getWorldMatrix();
+    m_Terrain->SendData(m_Direct3D->GetDeviceContext());
+
+    m_PlaneTessellShader->setTexture(nullptr);
+    m_PlaneTessellShader->setHeightmap(nullptr);
+
+    worldMatrix = XMMatrixScaling(20.0f, 4.0f, 20.0f);
+
     // Set shader parameters
-    m_UberShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
-      projectionMatrix, XMMatrixIdentity());
+    m_PlaneTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
+                                  projectionMatrix, XMMatrixIdentity());
 
     // Render object (combination of mesh geometry and shader process
-    m_UberShader->Render(m_Direct3D->GetDeviceContext(), m_PlaneMesh->GetIndexCount());
+    m_PlaneTessellShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
+
     break;
 
   default:
@@ -536,80 +516,8 @@ void Procedural::drawGeometry()
 
 // -----------------------------------------------------------------------------
 
-void Procedural::updateHeightmap()
-{
-  XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
-
-  // Generate the view matrix based on the camera's position.
-  m_Camera->Update();
-
-  // Set the render target to be the render to texture.
-  m_TempMap->SetRenderTarget(m_Direct3D->GetDeviceContext());
-
-  // Clear the render to texture.
-  m_TempMap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
-
-  // Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
-  m_Direct3D->GetWorldMatrix(worldMatrix);
-
-  // To render ortho mesh
-  // Turn off the Z buffer to begin all 2D rendering.
-  m_Direct3D->TurnZBufferOff();
-
-  m_Direct3D->GetOrthoMatrix(orthoMatrix);// ortho matrix for 2D rendering
-  m_Camera->GetBaseViewMatrix(baseViewMatrix);
-
-  m_HeightmapMesh->SendData(m_Direct3D->GetDeviceContext());
-
-  m_simplexShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, baseViewMatrix,
-                                       orthoMatrix);
-
-  m_simplexShader->Render(m_Direct3D->GetDeviceContext(), m_HeightmapMesh->GetIndexCount());
-  
-  m_Direct3D->TurnZBufferOn();
-
-}
-
-// -----------------------------------------------------------------------------
-
-void Procedural::calculateNormals()
-{
-  XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
-
-  // Generate the view matrix based on the camera's position.
-  m_Camera->Update();
-
-  // Set the render target to be the render to texture.
-  m_Heightmap->SetRenderTarget(m_Direct3D->GetDeviceContext());
-
-  // Clear the render to texture.
-  m_Heightmap->ClearRenderTarget(m_Direct3D->GetDeviceContext(), COLOUR_ZERO);
-
-  // Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
-  m_Direct3D->GetWorldMatrix(worldMatrix);
-
-  // To render ortho mesh
-  // Turn off the Z buffer to begin all 2D rendering.
-  m_Direct3D->TurnZBufferOff();
-
-  m_Direct3D->GetOrthoMatrix(orthoMatrix);// ortho matrix for 2D rendering
-  m_Camera->GetBaseViewMatrix(baseViewMatrix);
-
-  m_HeightmapMesh->SendData(m_Direct3D->GetDeviceContext());
-
-  m_NormalShader->SetShaderParameters(m_Direct3D->GetDeviceContext(), worldMatrix, baseViewMatrix,
-                                      orthoMatrix, m_TempMap->GetShaderResourceView(),
-                                      STANDARD, XMFLOAT3(0.0f, 0.0f, 0.0f));
-
-  m_NormalShader->Render(m_Direct3D->GetDeviceContext(), m_HeightmapMesh->GetIndexCount());
-
-  m_Direct3D->TurnZBufferOn();
 
 
-
-}
-
-// -----------------------------------------------------------------------------
 
 
 
