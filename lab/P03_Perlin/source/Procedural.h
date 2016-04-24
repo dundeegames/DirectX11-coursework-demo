@@ -104,7 +104,8 @@ private:
   OrthoMesh* m_OrthoMesh;
   const XMFLOAT3 m_colourOverlay;
 
-  float tessellationLevel;
+  float m_tessellationLevel;
+  float m_sphereRotation;
 
 };
 

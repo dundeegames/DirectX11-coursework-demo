@@ -1,12 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
-* \file       ubertessellfbm_ps.hlsl
-* \brief      Uber Tessellation pix.shader with Fractional Brownian motion texturing
+* \file       ubermarble_ps.hlsl
+* \brief      Uber Tessellation pix.shader with Perlin Simplex Noise
 *
-* \details    Calculate lighting for a MAX_LIGHTS (also texturing)
-*             Fractional Brownian motion is based on Perlin Simplex Noise
-*
-*             This implementation is "Simplex Noise" as presented by Ken Perlin
+* \details    This implementation is "Simplex Noise" as presented by Ken Perlin
 *             at a relatively obscure and not often cited course session
 *             "Real-Time Shading" at Siggraph 2001 (before real time shading actually took on),
 *             under the title "hardware noise". The 3D function is numerically
@@ -18,7 +15,7 @@
 *             [source code]. Available from: http://staffwww.itn.liu.se/~stegu/simplexnoise/DSOnoises.html
 *             [Accessed 5 April 2016].
 *
-*             Note: Ported from C to HLSL domain shader by Jiri Klic. 
+*             Note: Ported from C to HLSL domain shader by Jiri Klic.
 *
 * \author     Stefan Gustavson (stegu@itn.liu.se), 2003-2005
 * \author     Jiri Klic
@@ -45,25 +42,27 @@
 
 
 
-
 // DEFINES /////////////////////////////////////////////////////////////////////
 
 #define MAX_LIGHTS 8
 #define SWITCH_ON 1
 #define SWITCH_OFF 0
 
-#define SAND    2.5f
-#define FOREST  4.0f
-#define SNOW    5.0f
+// Simplex -------------------------------------------------------
 
+#define PI 3.14159265359f
 
-// SIMPLEX -----------------------------------------
+// 2D Simplex Noise
+#define F2 0.366025403          // F2 = 0.5f *( sqrt(3.0f) - 1.0f)
+#define G2 0.211324865          // G2 = (3.0f - sqrt(3.0f)) / 6.0f
 
 // Simple skewing factors for the 3D case
 #define F3 0.333333333          // F3 = 1.0f / 3.0f 
 #define G3 0.166666667          // G3 = 1.0f / 6.0f
 
+#define SCALE_FACTOR2D 40.0f    // TODO: The scale factors are preliminary!
 #define SCALE_FACTOR3D 32.0f
+
 
 // DATA ////////////////////////////////////////////////////////////////////////
 
@@ -114,17 +113,12 @@ static const int perm[512] = { 151, 160, 137, 91, 90, 15,
 
 // -----------------------------------------------------------------------------
 
-static const float4 CLR_WHITE = float4(1.0f, 1.0f, 1.0f, 1.0f);
-static const float4 CLR_GRAY = float4(0.3f, 0.3f, 0.3f, 1.0f);
-static const float4 CLR_BLACK = float4(0.0f, 0.0f, 0.0f, 1.0f);
-static const float4 CLR_GREEN = float4(0.0f, 0.25f, 0.0f, 1.0f);
-static const float4 CLR_YELLOW = float4(0.5f, 0.5f, 0.0f, 1.0f);
-static const float4 CLR_BLUE = float4(0.0f, 0.0f, 1.0f, 1.0f);
+
 
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
 
 /**
-* Helper function to compute gradient-dot-residualvectors (3D)
+* Helper functions to compute gradients-dot-residualvectors (2D or 3D)
 * Note that these generate gradients of more than unit length. To make
 * a close match with the value range of classic Perlin noise, the final
 * noise values need to be rescaled to fit nicely within [-1,1].
@@ -136,12 +130,108 @@ static const float4 CLR_BLUE = float4(0.0f, 0.0f, 1.0f, 1.0f);
 * float SLnoise = (noise(x,y,z) + 1.0) * 0.5;
 */
 
+float  grad2(int hash, float x, float y)
+{
+  int h = hash & 7;               // Convert low 3 bits of hash code
+  float u = h<4 ? x : y;          // into 8 simple gradient directions,
+  float v = h<4 ? y : x;          // and compute the dot product with (x,y).
+  return ((h & 1) ? -u : u) + ((h & 2) ? -2.0f*v : 2.0f*v);
+}
+
 float  grad3(int hash, float x, float y, float z)
 {
   int h = hash & 15;              // Convert low 4 bits of hash code into 12 simple
   float u = h<8 ? x : y;          // gradient directions, and compute dot product.
   float v = h<4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
   return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
+}
+
+// -----------------------------------------------------------------------------
+
+// 2D simplex noise
+float snoise2(float x, float y)
+{
+  float n0, n1, n2; // Noise contributions from the three corners
+
+  // Skew the input space to determine which simplex cell we're in
+  float s = (x + y) * F2;       // Hairy factor for 2D
+  float xs = x + s;
+  float ys = y + s;
+  int i = floor(xs);
+  int j = floor(ys);
+
+  float t = (float)(i + j) * G2;
+  float X0 = i - t;             // Unskew the cell origin back to (x,y) space
+  float Y0 = j - t;
+  float x0 = x - X0;            // The x,y distances from the cell origin
+  float y0 = y - Y0;
+
+  // For the 2D case, the simplex shape is an equilateral triangle.
+  // Determine which simplex we are in.
+  int i1, j1;         // Offsets for second (middle) corner of simplex in (i,j) coords
+
+  if (x0 > y0)
+  {
+    i1 = 1; j1 = 0;             // lower triangle, XY order: (0,0)->(1,0)->(1,1)
+  }
+  else
+  {
+    i1 = 0; j1 = 1;             // upper triangle, YX order: (0,0)->(0,1)->(1,1)
+  }
+
+  // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
+  // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
+  // c = (3-sqrt(3))/6
+
+  float x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
+  float y1 = y0 - j1 + G2;
+  float x2 = x0 - 1.0f + 2.0f * G2; // Offsets for last corner in (x,y) unskewed coords
+  float y2 = y0 - 1.0f + 2.0f * G2;
+
+  // Wrap the integer indices at 256, to avoid indexing perm[] out of bounds
+  int ii = i & 0xff;
+  int jj = j & 0xff;
+
+  // Calculate the contribution from the three corners
+  float t0 = 0.5f - x0*x0 - y0*y0;
+
+  if (t0 < 0.0f)
+  {
+    n0 = 0.0f;
+  }
+  else
+  {
+    t0 *= t0;
+    n0 = t0 * t0 * grad2(perm[ii + perm[jj]], x0, y0);
+  }
+
+  float t1 = 0.5f - x1*x1 - y1*y1;
+
+  if (t1 < 0.0f)
+  {
+    n1 = 0.0f;
+  }
+  else
+  {
+    t1 *= t1;
+    n1 = t1 * t1 * grad2(perm[ii + i1 + perm[jj + j1]], x1, y1);
+  }
+
+  float t2 = 0.5f - x2*x2 - y2*y2;
+
+  if (t2 < 0.0f)
+  {
+    n2 = 0.0f;
+  }
+  else
+  {
+    t2 *= t2;
+    n2 = t2 * t2 * grad2(perm[ii + 1 + perm[jj + 1]], x2, y2);
+  }
+
+  // Add contributions from each corner to get the final noise value.
+  // The result is scaled to return values in the interval [-1,1].
+  return SCALE_FACTOR2D * (n0 + n1 + n2); // TODO: The scale factor is preliminary!
 }
 
 // -----------------------------------------------------------------------------
@@ -273,47 +363,49 @@ float snoise3(float x, float y, float z)
 
   // Add contributions from each corner to get the final noise value.
   // The result is scaled to stay just inside [-1,1]
-  return SCALE_FACTOR3D * (n0 + n1 + n2 + n3);
+  return SCALE_FACTOR3D * (n0 + n1 + n2 + n3); // TODO: The scale factor is preliminary!
 }
 
 // -----------------------------------------------------------------------------
 
-/**
-* \brief      Ridget multifractal terrain model
-*
-* \details    Based on Texturing & Modeling procedural approach 3rd Ed., Chapter 16
-* \param      float H = 1.0, offset = 1.0, gain 2.0
-* \return     float height
-*/
-float ridgetMultifractal(float3 inputPoint, float H, float lacunarity, float offset, float gain)
+float stripes(float x, float f)
 {
-  const int OCTAVES = 8;
+  float t = ( 0.5f + 0.5 * sin(f * 2*PI * x) );
 
-  float3 position = inputPoint;
-  float frequency = 1.0f;
-  float result = 0.0f;
-  float signal = 0.0f;
-  float weight = 0.0f;
-
-  for (int i = 0; i < OCTAVES; i++)
-  {
-    signal = (snoise3(position.x, position.y, position.z) * pow(lacunarity, -H * i));
-
-    signal = abs(signal);
-
-    result += signal;
-
-    position.x *= lacunarity;
-    position.y *= lacunarity;
-    position.z *= lacunarity;
-
-  }
-
-  return result;
+  return (t * t - 0.5f);
 }
 
-// SHADER //////////////////////////////////////////////////////////////////////
+// -----------------------------------------------------------------------------
 
+float turbulence(float x, float y, float z, float f)
+{
+  float t = x;
+
+ 
+  return t;
+}
+
+// -----------------------------------------------------------------------------
+
+float marble(float3 inputPoint, int f)
+{
+  //float t = 2.0f * (inputPoint.x + inputPoint.y) - 1.5f;
+  float t = 2.5f * inputPoint.x;
+  float signal = 0.0f;
+
+  for (int i = 1; i <= f; i++)
+  {
+    signal = snoise3(inputPoint.x * (float)i, inputPoint.y * (float)i, inputPoint.z * (float)i);
+    signal = (abs(signal) / i);
+
+    t += signal;
+  }
+
+  return sin(t);
+}
+
+
+// SHADER //////////////////////////////////////////////////////////////////////
 
 Texture2D shaderTexture : register(t0);
 SamplerState SampleType : register(s0);
@@ -338,13 +430,14 @@ cbuffer LightBuffer : register(cb0)
 
 struct InputType
 {
-    float4 position : SV_POSITION;
-    float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
-    float3 viewDirection : TEXCOORD1;
-    float3 position3D : TEXCOORD2;
+  float4 position : SV_POSITION;
+  float2 tex : TEXCOORD0;
+  float3 normal : NORMAL;
+  float3 viewDirection : TEXCOORD1;
+  float3 position3D : TEXCOORD2;
 };
 
+// -----------------------------------------------------------------------------
 
 float4 main(InputType input) : SV_TARGET
 {
@@ -357,32 +450,8 @@ float4 main(InputType input) : SV_TARGET
   float4 specularFX = (float4)0;
   float4 finalSpec = (float4)0;
 
-  float displacement = 0.0f;
   float3 pixelPosition = input.position3D;
-
-  displacement = ridgetMultifractal(pixelPosition, 1.5f, 1.5f, 1.0f, 2.0f);
-
-  pixelPosition.y += 0.5 * displacement;
-
-
-  // Determine pixel texture colour based on its y pos.
-  if (pixelPosition.y > SNOW)
-  {
-    textureColour = CLR_WHITE;
-  }
-  else if ((pixelPosition.y < SNOW) && (pixelPosition.y > FOREST))
-  {
-    textureColour = CLR_GRAY;
-    //textureColour = lerp(yellowColour, greenColour, (position.y / (0.4f * displacement)));
-  }
-  else if ((pixelPosition.y < FOREST) && (pixelPosition.y > SAND))
-  {
-    textureColour = CLR_GREEN;
-  }
-  else
-  {
-    textureColour = CLR_YELLOW;
-  }
+  float colourChannel = 0.0f;
 
 
   // Set the default output colour to the ambient light value for all pixels.
@@ -393,26 +462,26 @@ float4 main(InputType input) : SV_TARGET
       finalColour += lightData[a].ambient;
     }
   }
+
   finalColour = saturate(finalColour);
 
 
-  //// Sample the pixel color from the texture using the sampler at this texture coordinate location.
+  // Sample the pixel color from the texture using the sampler at this texture coordinate location.
   //textureColour = shaderTexture.Sample(SampleType, input.tex);
 
+  //colourChannel = snoise3(pixelPosition.x, pixelPosition.y, pixelPosition.z);
+  //colourChannel *= 7.0f;
+
+  colourChannel = marble(pixelPosition, 8);
+  colourChannel = ((colourChannel * 0.5f) + 0.5f);  // rescale fro [-1, 1] to [0, 1]
+  colourChannel = clamp(colourChannel, 0, 1);
+  textureColour = float4(colourChannel, colourChannel, colourChannel, 1.0f);
   
+
   // Multiply the texture pixel and the final diffuse color to get the final pixel color result.
   //finalColour.xyz *= textureColour.xyz;
   finalColour = saturate(finalColour * textureColour);
-  
 
-  //if (hasTexture)
-  //{
-  //  // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-  //  textureColour = shaderTexture.Sample(SampleType, input.tex);
-
-  //  // Multiply the texture pixel and the final diffuse color to get the final pixel color result.
-  //  finalColour *= textureColour;
-  //}
 
   for (int i = 0; i < MAX_LIGHTS; i++)
   {
@@ -452,6 +521,7 @@ float4 main(InputType input) : SV_TARGET
       }
     }
   }
+
 
   return finalColour;
 }

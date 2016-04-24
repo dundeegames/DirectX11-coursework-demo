@@ -117,7 +117,7 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
 
   
   m_SphereShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
-  m_SphereShader->InitShader(L"shaders/uber_vs.hlsl", L"shaders/uber_ps.hlsl");
+  m_SphereShader->InitShader(L"shaders/uber_vs.hlsl", L"shaders/ubermarble_ps.hlsl");
 
 
   m_fBmTessellShader = new UberTessellShader(m_Direct3D->GetDevice(), hwnd);
@@ -146,7 +146,8 @@ void Procedural::init(HINSTANCE hinstance, HWND hwnd,
   m_TextureShader->InitShader(L"shaders/texture_vs.hlsl", L"shaders/texture_ps.hlsl");
 
 
-  tessellationLevel = 8.0f;
+  m_tessellationLevel = 8.0f;
+  m_sphereRotation = 0.0f;
 
 }
 
@@ -195,25 +196,23 @@ bool Procedural::Frame()
 
   if (m_Input->isKeyDown('P'))
   {
-    tessellationLevel += 5.0f * m_Timer->GetTime();
+    m_tessellationLevel += 5.0f * m_Timer->GetTime();
 
-    if (tessellationLevel > 64.0f)
+    if (m_tessellationLevel > 64.0f)
     {
-      tessellationLevel = 64.0f;
+      m_tessellationLevel = 64.0f;
     }
   }
 
   if (m_Input->isKeyDown('O'))
   {
-    tessellationLevel -= 5.0f * m_Timer->GetTime();
+    m_tessellationLevel -= 5.0f * m_Timer->GetTime();
 
-    if (tessellationLevel < 1.0f)
+    if (m_tessellationLevel < 1.0f)
     {
-      tessellationLevel = 1.0f;
+      m_tessellationLevel = 1.0f;
     }
   }
-
-
 
   // Render the graphics.
   result = Render();
@@ -424,6 +423,15 @@ void Procedural::drawGeometry()
 {
   XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
+  m_sphereRotation += 0.1f;
+
+  //if (m_sphereRotation > 360.0f)
+  //{
+  //  m_sphereRotation -= 360.0f;
+  //}
+
+
+
   // Generate the view matrix based on the camera's position.
   m_Camera->Update();
 
@@ -432,7 +440,7 @@ void Procedural::drawGeometry()
   m_Camera->GetViewMatrix(viewMatrix);
   m_Direct3D->GetProjectionMatrix(projectionMatrix);
 
-  worldMatrix = XMMatrixTranslation(0.0f, 9.0f, 0.0f);
+  worldMatrix = XMMatrixTranslation(0.0f, 12.0f, 0.0f);
 
   // Send geometry data (from mesh)
   m_PointMesh->SendData(m_Direct3D->GetDeviceContext());
@@ -450,12 +458,13 @@ void Procedural::drawGeometry()
   // Send geometry data (from mesh)
   m_SphereMesh->SendData(m_Direct3D->GetDeviceContext());
   m_SphereShader->setTexture(m_SphereMesh->GetTexture());
-  // Get Mesh position
-  //worldMatrix = XMMatrixTranslation(-1.5f, 0.0f, 0.0f);
-  worldMatrix = XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 9.0f, 0.0f);
+
+  // Set Mesh position
+  worldMatrix = XMMatrixMultiply(XMMatrixScaling(3.0f, 3.0f, 3.0f), XMMatrixTranslation(0.0f, 12.0f, 0.0f) );
+
   // Set shader parameters
   m_SphereShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
-    projectionMatrix, XMMatrixIdentity());
+                          projectionMatrix, XMMatrixIdentity());
 
   // Render object (combination of mesh geometry and shader process
   m_SphereShader->Render(m_Direct3D->GetDeviceContext(), m_SphereMesh->GetIndexCount());
@@ -466,7 +475,7 @@ void Procedural::drawGeometry()
   case FBM_STAGE:
 
     m_fBmTessellShader->setCamera(m_Camera);
-    m_fBmTessellShader->setFixedTessellation(tessellationLevel);
+    m_fBmTessellShader->setFixedTessellation(m_tessellationLevel);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
@@ -479,6 +488,7 @@ void Procedural::drawGeometry()
     // Set shader parameters
     m_fBmTessellShader->setView(m_Direct3D->GetDeviceContext(), worldMatrix, viewMatrix,
                                  projectionMatrix, XMMatrixIdentity());
+
     // Render object (combination of mesh geometry and shader process
     m_fBmTessellShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount());
 
@@ -488,7 +498,7 @@ void Procedural::drawGeometry()
   case SIMPLEX_STAGE:
 
     m_PlaneTessellShader->setCamera(m_Camera);
-    m_PlaneTessellShader->setFixedTessellation(tessellationLevel);
+    m_PlaneTessellShader->setFixedTessellation(m_tessellationLevel);
 
     // Send geometry data (from mesh)
     m_Terrain->SendData(m_Direct3D->GetDeviceContext());
