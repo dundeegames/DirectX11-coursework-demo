@@ -10,7 +10,7 @@
 * \date       February 2016
 * \pre
 * \post
-* \bug        No known bugs
+* \bug        No known bugs 
 * \warning
 * \todo
 *
