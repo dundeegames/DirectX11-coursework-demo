@@ -21,15 +21,9 @@
     <ClCompile Include="source\Procedural.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\PerlinNoise.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Procedural.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\PerlinNoise.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
